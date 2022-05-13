@@ -6,7 +6,7 @@
 /*   By: whazami <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 20:38:23 by whazami           #+#    #+#             */
-/*   Updated: 2022/05/12 22:25:32 by whazami          ###   ########.fr       */
+/*   Updated: 2022/05/13 02:21:24 by whazami          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,11 +46,9 @@ namespace ft
 		value_type	operator*() const {
 			return *this->p;
 		}
-
 		void	operator++(int) {
 			this->p++;
 		}
-
 		bool	operator!=(vector_iterator rhs) {
 			if (this->p != rhs.p)
 				return true;
