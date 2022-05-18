@@ -18,8 +18,8 @@ RM			= rm -f
 
 ${OBJS_D}%.o: %.cpp ${HEADERS}
 		mkdir -p ${OBJS_D}
-		${CXX} ${CXXFLAGS} -D NAMESPACE="ft" -c $< -o $@
-${OBJS_D_R}%.o: %.cpp ${HEADERS}
+		${CXX} ${CXXFLAGS} -D NAMESPACE="ft" -D MINE="1" -c $< -o $@
+${OBJS_D_R}%.o: %.cpp
 		mkdir -p ${OBJS_D_R}
 		${CXX} ${CXXFLAGS} -D NAMESPACE="std" -c $< -o $@
 

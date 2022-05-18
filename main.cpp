@@ -1,9 +1,13 @@
-#include "vector/vector.hpp"
 #include <iostream>
-#include <vector>
+
+#ifdef MINE
+	#include "vector/vector.hpp"
+#else
+	#include <vector>
+#endif
 
 using namespace NAMESPACE;
-#include <typeinfo>
+
 int main()
 {
 	vector<int> v(3, 42);
@@ -38,7 +42,13 @@ int main()
 	std::cout << "v3 (copy of v): ";
 	for (vector<int>::iterator it = v3.begin(); it != v3.end(); it++)
 		std::cout << *it << " ";
-	std::cout << std::endl << "v3[2]: " << v3[1] << std::endl;
+	std::cout << std::endl << "v3[1]: " << v3[1] << std::endl;
+	std::cout << v3.at(1) << std::endl;
+	try {
+		v3.at(2);
+	} catch (const std::exception& e) {
+		std::cout << e.what() << std::endl;
+	}
 
 	vector<int> v4;
 	if (v4.empty())
@@ -50,6 +60,13 @@ int main()
 	std::cout << *last << std::endl;
 	std::cout << vc.front() << " " << vc.back() << std::endl;
 	std::cout << vc[1] << std::endl;
+	std::cout << vc.at(1) << std::endl;
+	try {
+		vc.at(-3);
+	} catch (const std::exception& e) {
+		std::cout << e.what() << std::endl;
+	}
+
 	/*vector<float> v5(v3.begin(), v3.end());
 	std::cout << "v5 Range constructor: ";
 	for (vector<float>::iterator it = v5.begin(); it != v5.end(); it++)

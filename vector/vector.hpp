@@ -2,6 +2,9 @@
 # define VECTOR_HPP
 
 # include <iostream>
+# include <string>
+# include <sstream>
+# include <stdexcept>
 # include "../iterators/vector_iterator.hpp"
 
 namespace ft
@@ -25,13 +28,15 @@ namespace ft
 			explicit vector(const allocator_type& alloc = allocator_type()) {
 				this->alloc = alloc;
 				this->arr = this->alloc.allocate(0);
-				this->sizee = 0;	
+				this->capacity = 0;
+				this->sizee = 0;
 			}
 
 			explicit vector(size_type n, const value_type& val = value_type(),
 							const allocator_type& alloc = allocator_type()) {
 				this->alloc = alloc;
 				this->arr = this->alloc.allocate(n);
+				this->capacity = n;
 				this->sizee = n;
 				for (size_type i = 0; i < this->sizee; i++)
 					this->arr[i] = val;
@@ -54,7 +59,7 @@ namespace ft
 			}
 
 			~vector() {
-				this->alloc.deallocate(this->arr, this->sizee);
+				this->alloc.deallocate(this->arr, this->capacity);
 			}
 			
 			// Methods
@@ -86,6 +91,17 @@ namespace ft
 				return arr[sizee - 1];
 			}
 
+			reference at(size_type n) {
+				if (n >= this->sizee)
+					throw std::out_of_range(this->oor_what(n));
+				return arr[n];
+			}
+			const_reference at(size_type n) const {
+				if (n >= this->sizee)
+					throw std::out_of_range(this->oor_what(n));
+				return arr[n];
+			}
+
 			size_type size() const {
 				return sizee;
 			}
@@ -100,6 +116,7 @@ namespace ft
 			vector	&operator=(const vector& x) {
 				this->alloc.deallocate(this->arr, this->sizee);
 				this->arr = this->alloc.allocate(x.sizee);
+				this->capacity = x.sizee;
 				for (size_type i = 0; i < x.sizee; i++)
 					this->arr[i] = x.arr[i];
 				this->sizee = x.sizee;
@@ -116,7 +133,22 @@ namespace ft
 		private:
 			pointer			arr;
 			allocator_type	alloc;
-			size_type		sizee;	// cause size already taken by method
+			size_type		sizee;		// cause size already taken by method
+			size_type		capacity;	// allocated size of the vector
+
+			// Get the error message for out_of_range exception
+			std::string	oor_what(size_type n) const {
+				std::stringstream ss;
+				std::string what = "vector::_M_range_check: __n (which is ";
+				ss << n;
+				what.append(ss.str());
+				what.append(") >= this->size() (which is ");
+				ss.str("");
+				ss << this->size();
+				what.append(ss.str());
+				what.push_back(')');
+				return what;
+			}
 	};
 }
 
