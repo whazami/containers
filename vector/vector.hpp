@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   vector.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: whazami <marvin@42.fr>                     +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/09 15:17:16 by whazami           #+#    #+#             */
-/*   Updated: 2022/05/13 02:42:27 by whazami          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef VECTOR_HPP
 # define VECTOR_HPP
 
@@ -22,22 +10,50 @@ namespace ft
 	class vector
 	{
 		public:
-			typedef T							value_type;
-			typedef vector_iterator<value_type>	iterator;
-			typedef size_t						size_type;
-			typedef Alloc						allocator_type;
+			typedef 			T									value_type;
+			typedef 			Alloc								allocator_type;
+			typedef	typename	allocator_type::reference			reference;			
+			typedef typename	allocator_type::const_reference		const_reference;			
+			typedef	typename	allocator_type::pointer				pointer;			
+			typedef typename	allocator_type::const_pointer		const_pointer;			
+			typedef 			vector_iterator<value_type>			iterator;
+			typedef 			size_t								size_type;
 			
+
 			// Constructors & Destructor
-			explicit vector(size_type n, const value_type& val = value_type(), const allocator_type& alloc = allocator_type()) {
+			explicit vector(const allocator_type& alloc = allocator_type()) {
+				this->alloc = alloc;
+				this->arr = this->alloc.allocate(0);
+				this->_size = 0;	
+			}
+
+			explicit vector(size_type n, const value_type& val = value_type(),
+								const allocator_type& alloc = allocator_type()) {
+				this->alloc = alloc;
 				this->arr = this->alloc.allocate(n);
-				this->size = n;
-				for (size_type i = 0; i < this->size; i++)
+				this->_size = n;
+				for (size_type i = 0; i < this->_size; i++)
 					this->arr[i] = val;
-				(void)alloc;
+			}
+
+			/*template <class InputIterator>
+			vector(InputIterator first, InputIterator last,
+					const allocator_type& alloc = allocator_type()) {
+				this->alloc = alloc;
+				this->_size = last - first;
+				this->arr = this->alloc.allocate(this->_size);
+				size_type i = 0;
+				for (InputIterator it = first; it != last; it++, i++)
+					this->arr[i] = *it;
+			}*/
+
+			vector (const vector &x) {
+				this->arr = this->alloc.allocate(0);
+				*this = x;	
 			}
 
 			~vector() {
-				alloc.deallocate(this->arr, this->size);
+				this->alloc.deallocate(this->arr, this->_size);
 			}
 			
 			// Iterators
@@ -46,13 +62,60 @@ namespace ft
 			}
 			
 			iterator end() {
-				return iterator(arr + size);
+				return iterator(arr + _size);
 			}
 
+			// operator=()
+			vector	&operator=(const vector& x) {
+				this->alloc.deallocate(this->arr, this->_size);
+				this->arr = this->alloc.allocate(x._size);
+				for (size_type i = 0; i < x._size; i++)
+					this->arr[i] = x.arr[i];
+				this->_size = x._size;
+				//this->alloc = x.alloc;
+				return *this;
+			}
+
+			//operator[]()
+			reference operator[] (size_type n) {
+				//if (n > _size || n < 0)	
+				return arr[n]; 
+			}
+			
+			const_reference operator[] (size_type n) const{
+				//if (n > _size || n < 0)	
+				return arr[n]; 
+			}
+			
+			// Front() et Back()
+			reference front(){
+				return arr[0];
+			}
+			const_reference front() const{
+				return arr[0];
+			}
+			reference back(){
+				return arr[_size - 1];
+			}
+			const_reference back() const{
+				return arr[_size - 1];
+			}
+
+			// size()
+			size_type size() const { //problem name size avec variable private donc ajout d'un _devant la variable size 
+				return _size;
+			}
+
+			// empty()
+			bool empty() const {
+				if (_size == 0)
+					return true;
+				return false;
+			}
 		private:
-			value_type		*arr;
+			pointer			arr;
 			allocator_type	alloc;
-			size_type		size;
+			size_type		_size;
 	};
 }
 

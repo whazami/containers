@@ -12,8 +12,8 @@ OBJS_R		= ${SRCS:%.cpp=${OBJS_D_R}%.o}
 HEADERS		= vector/vector.hpp \
 			  iterators/vector_iterator.hpp
 
-CXX			= c++ #-g3 -fsanitize=address
-CXXFLAGS	= -Wall -Wextra -Werror -std=c++98 -pedantic
+CXX			= c++ -g3 -fsanitize=address
+CXXFLAGS	= -Wall -Wextra -Werror #-std=c++98 -pedantic
 RM			= rm -f
 
 ${OBJS_D}%.o: %.cpp ${HEADERS}
