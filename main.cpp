@@ -81,11 +81,35 @@ int main()
 	std::cout << std::endl;
 	
 	/// ** SUPER VOID VECTOR TESTER ** ////
-	vector< vector<float> > vvs(1);
-	//v4.assign
-	/*v4.push_back(1);
-	std::cout << v4.back() << std::endl;*/ 
+	// Should not segfault
+	vector< vector<float> > vvs(10);
+	vvs[0].push_back(4.5f);
+	std::cout << vvs[0].back() << " " << vvs[0].front() << std::endl;
+	vvs[1] = v5;
+	std::cout << vvs[1].front() << std::endl;
+	try {
+		(void)vvs[2].at(0);
+	} catch (const std::exception& e) {
+		std::cout << e.what() << std::endl;
+	}
+	vvs[3].assign(v5.begin(), v5.end());
+	std::cout << vvs[3][0] << vvs[3][1] << std::endl;
+	vvs[4].assign(4, 4.44f);
+	for (vector<float>::iterator it = vvs[4].begin(); it != vvs[4].end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;
 
+	// Should segfault
+	vector<float> vv;
+	//vector<float>::iterator it = vv.begin(); std::cout << *it;
+	//vector<float>::iterator it = vv.end(); std::cout << *it;
+	//std::cout << vv[0];
+	//std::cout << vv.front();
+	//std::cout << vv.back();
+	// pop_back
+
+
+	// Range constructor
 	/*vector<float> v0(v3.begin(), v3.end());
 	std::cout << "v0 Range constructor: ";
 	for (vector<float>::iterator it = v0.begin(); it != v0.end(); it++)

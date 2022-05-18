@@ -40,7 +40,7 @@ namespace ft
 				this->capacity = n;
 				this->sizee = n;
 				for (size_type i = 0; i < this->sizee; i++)
-					this->arr[i] = val;
+					this->alloc.construct(arr + i, val);
 			}
 
 			// Needs enable_if
@@ -55,28 +55,32 @@ namespace ft
 				this->capacity = this->sizee;
 				size_type i = 0;
 				for (InputIterator it = first; it != last; it++, i++)
-					this->arr[i] = *it;
+					this->alloc.construct(arr + i, *it);
 			}*/
 
 			vector (const vector &x) {
 				this->arr = NULL;
+				this->capacity = 0;
+				this->sizee = 0;
 				*this = x;
 			}
 
 			~vector() {
+				for (size_t i = 0; i < this->sizee; i++)
+					this->alloc.destroy(this->arr + i);
 				if (this->arr)
 					this->alloc.deallocate(this->arr, this->capacity);
 			}
 			
 			vector	&operator=(const vector& x) {
-				std::cout << "alloc address: " << &this->alloc << std::endl;
-				std::cout << "arr address: " << this->arr << std::endl;
+				for (size_t i = 0; i < this->sizee; i++)
+					this->alloc.destroy(this->arr + i);
 				if (this->arr)
 					this->alloc.deallocate(this->arr, this->sizee);
 				this->arr = (x.sizee != 0) ? this->alloc.allocate(x.sizee) : NULL;
 				this->capacity = x.sizee;
 				for (size_type i = 0; i < x.sizee; i++)
-					this->arr[i] = x.arr[i];
+					this->alloc.construct(arr + i, x.arr[i]);
 				this->sizee = x.sizee;
 				return *this;
 			}
@@ -143,6 +147,8 @@ namespace ft
 			// Modifiers
 			template <class InputIterator>
 			void assign(InputIterator first, InputIterator last) {	// same as range constructor
+				for (size_t i = 0; i < this->sizee; i++)
+					this->alloc.destroy(this->arr + i);
 				if (this->arr)
 					this->alloc.deallocate(this->arr, this->capacity);	// only this line changes
 				this->sizee = 0;
@@ -152,16 +158,18 @@ namespace ft
 				this->capacity = this->sizee;
 				size_type i = 0;
 				for (InputIterator it = first; it != last; it++, i++)
-					this->arr[i] = *it;
+					this->alloc.construct(arr + i, *it);
 			}
 			void assign(size_type n, const value_type& val) {	// same as fill constructor
+				for (size_t i = 0; i < this->sizee; i++)
+					this->alloc.destroy(this->arr + i);
 				if (this->arr)
 					this->alloc.deallocate(this->arr, this->capacity);	// only this line changes
 				this->arr = (n != 0) ? this->alloc.allocate(n) : NULL;
 				this->capacity = n;
 				this->sizee = n;
 				for (size_type i = 0; i < n; i++)
-					this->arr[i] = val;
+					this->alloc.construct(arr + i, val);
 			}
 
 			void push_back(const value_type& val) {
@@ -169,7 +177,9 @@ namespace ft
 				if (this->sizee > this->capacity) {
 					pointer tmp = (this->sizee - 1 != 0) ? this->alloc.allocate(this->sizee - 1) : NULL;
 					for (size_t i = 0; i < this->sizee - 1; i++)
-						tmp[i] = this->arr[i];
+						this->alloc.construct(tmp + i, this->arr[i]);
+					for (size_t i = 0; i < this->sizee - 1; i++)
+						this->alloc.destroy(this->arr + i);
 					if (this->arr)
 						this->alloc.deallocate(this->arr, this->capacity);
 					if (this->capacity == 0)
@@ -178,13 +188,15 @@ namespace ft
 						this->capacity *= 2;
 					this->arr = this->alloc.allocate(this->capacity);
 					for (size_t i = 0; i < this->sizee - 1; i++)
-						this->arr[i] = tmp[i];
+						this->alloc.construct(this->arr + i, tmp[i]);
+					for (size_t i = 0; i < this->sizee - 1; i++)
+						this->alloc.destroy(tmp + i);
 					if (tmp)
 						this->alloc.deallocate(tmp, this->sizee - 1);
-					this->arr[this->sizee - 1] = val;
+					this->alloc.construct(this->arr + this->sizee - 1, val);
 				}
 				else
-					this->arr[this->sizee - 1] = val;
+					this->alloc.construct(this->arr + this->sizee - 1, val);
 			}
 
 			void pop_back() {
