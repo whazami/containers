@@ -38,12 +38,18 @@ int main()
 	std::cout << "v3 (copy of v): ";
 	for (vector<int>::iterator it = v3.begin(); it != v3.end(); it++)
 		std::cout << *it << " ";
-	std::cout << std::endl << "v3[0]: " << v3[0] << std::endl;
+	std::cout << std::endl << "v3[2]: " << v3[1] << std::endl;
 
 	vector<int> v4;
 	if (v4.empty())
 		std::cout << "Default Constructor is empty " << std::endl;
 
+	const vector<int> vc(v3);
+	std::cout << *vc.begin() << std::endl;
+	vector<int>::const_iterator last = vc.end() - 1;
+	std::cout << *last << std::endl;
+	std::cout << vc.front() << " " << vc.back() << std::endl;
+	std::cout << vc[1] << std::endl;
 	/*vector<float> v5(v3.begin(), v3.end());
 	std::cout << "v5 Range constructor: ";
 	for (vector<float>::iterator it = v5.begin(); it != v5.end(); it++)

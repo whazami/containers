@@ -13,7 +13,7 @@ HEADERS		= vector/vector.hpp \
 			  iterators/vector_iterator.hpp
 
 CXX			= c++ -g3 -fsanitize=address
-CXXFLAGS	= -Wall -Wextra -Werror #-std=c++98 -pedantic
+CXXFLAGS	= -Wall -Wextra -Werror -std=c++98 -pedantic
 RM			= rm -f
 
 ${OBJS_D}%.o: %.cpp ${HEADERS}

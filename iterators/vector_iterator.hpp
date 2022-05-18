@@ -6,7 +6,7 @@
 /*   By: whazami <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 20:38:23 by whazami           #+#    #+#             */
-/*   Updated: 2022/05/18 01:15:59 by whazami          ###   ########.fr       */
+/*   Updated: 2022/05/18 16:44:47 by whazami          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,6 +51,9 @@ namespace ft
 		}
 		difference_type	operator-(vector_iterator rhs) {
 			return this->p - rhs.p;
+		}
+		vector_iterator operator-(int n) {
+			return this->p - n;
 		}
 		bool	operator!=(vector_iterator rhs) {
 			if (this->p != rhs.p)
