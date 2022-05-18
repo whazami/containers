@@ -67,9 +67,28 @@ int main()
 		std::cout << e.what() << std::endl;
 	}
 
-	/*vector<float> v5(v3.begin(), v3.end());
-	std::cout << "v5 Range constructor: ";
+	vector<float> v5(7, 77.7f);
+	v5.assign(6, 66.6f);
+	std::cout << "Testing assign..." << std::endl;
 	for (vector<float>::iterator it = v5.begin(); it != v5.end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;
+	v5.assign(v3.begin(), v3.end());
+	for (int i = 0; i < 20; i++)
+		v5.push_back(42.42f);
+	for (vector<float>::iterator it = v5.begin(); it != v5.end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;
+	
+	/// ** SUPER VOID VECTOR TESTER ** ////
+	vector< vector<float> > vvs(1);
+	//v4.assign
+	/*v4.push_back(1);
+	std::cout << v4.back() << std::endl;*/ 
+
+	/*vector<float> v0(v3.begin(), v3.end());
+	std::cout << "v0 Range constructor: ";
+	for (vector<float>::iterator it = v0.begin(); it != v0.end(); it++)
 	std::cout << *it << " ";
 	std::cout << std::endl;*/
 	return (0);
