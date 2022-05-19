@@ -109,6 +109,10 @@ int main()
 	// pop_back
 
 
+	vector<float> v6(3, 5.5f);
+	v6.reserve(5);
+	for (vector<float>::iterator it = v6.begin(); it != v6.end(); it++)
+		std::cout << *it << std::endl;
 	// Range constructor
 	/*vector<float> v0(v3.begin(), v3.end());
 	std::cout << "v0 Range constructor: ";
