@@ -11,7 +11,8 @@ using namespace NAMESPACE;
 int main()
 {
 	vector<int> v(3, 42);
-
+	std::cout << v.size() << " " << v.capacity() << std::endl;
+	
 	std::cout << "v: ";
 	for (vector<int>::iterator it = v.begin(); it != v.end(); it++)
 		std::cout << *it << " ";
@@ -38,7 +39,8 @@ int main()
 		std::cout << *it << " ";
 	std::cout << std::endl;
 	
-	vector<int> v3(v);	
+	vector<int> v3(v);
+	std::cout << v3.size() << " " << v3.capacity() << std::endl;
 	std::cout << "v3 (copy of v): ";
 	for (vector<int>::iterator it = v3.begin(); it != v3.end(); it++)
 		std::cout << *it << " ";
@@ -53,8 +55,10 @@ int main()
 	vector<int> v4;
 	if (v4.empty())
 		std::cout << "Default Constructor is empty " << std::endl;
+	std::cout << v4.size() << " " << v4.capacity() << std::endl;
 
 	const vector<int> vc(v3);
+	std::cout << vc.size() << " " << vc.capacity() << std::endl;
 	std::cout << *vc.begin() << std::endl;
 	vector<int>::const_iterator last = vc.end() - 1;
 	std::cout << *last << std::endl;
@@ -68,14 +72,20 @@ int main()
 	}
 
 	vector<float> v5(7, 77.7f);
-	v5.assign(6, 66.6f);
+	v5[5] = 66.6f;
+	std::cout << "CAPA V5 " << v5.capacity() << std::endl;
+	v5.assign(3, 33.3f);
 	std::cout << "Testing assign..." << std::endl;
 	for (vector<float>::iterator it = v5.begin(); it != v5.end(); it++)
 		std::cout << *it << " ";
-	std::cout << std::endl;
+	std::cout << *v5.end() << " ";
+	std::cout << v5[4] << " " << v5[5] << " " << v5.back() << std::endl;
 	v5.assign(v3.begin(), v3.end());
-	for (int i = 0; i < 20; i++)
+	std::cout << v5.size() << " " << v5.capacity() << std::endl;
+	for (int i = 0; i < 20; i++) {
 		v5.push_back(42.42f);
+		std::cout << v5.size() << " " << v5.capacity() << std::endl;
+	}
 	for (vector<float>::iterator it = v5.begin(); it != v5.end(); it++)
 		std::cout << *it << " ";
 	std::cout << std::endl;
@@ -92,7 +102,9 @@ int main()
 	} catch (const std::exception& e) {
 		std::cout << e.what() << std::endl;
 	}
+	std::cout << vvs[3].size() << " " << vvs[3].capacity() << std::endl;
 	vvs[3].assign(v5.begin(), v5.end());
+	std::cout << vvs[3].size() << " " << vvs[3].capacity() << std::endl;
 	std::cout << vvs[3][0] << vvs[3][1] << std::endl;
 	vvs[4].assign(4, 4.44f);
 	for (vector<float>::iterator it = vvs[4].begin(); it != vvs[4].end(); it++)
@@ -110,9 +122,23 @@ int main()
 
 
 	vector<float> v6(3, 5.5f);
+	v6.pop_back();
+	std::cout << v6.size() << " " << v6.capacity() << std::endl;
 	v6.reserve(5);
+	std::cout << v6.size() << " " << v6.capacity() << std::endl;
 	for (vector<float>::iterator it = v6.begin(); it != v6.end(); it++)
 		std::cout << *it << std::endl;
+	try {
+		v6.reserve(2305843009213693952); // length_error exception
+		std::cout << "vector max size: " << v6.max_size() << std::endl;
+	} catch (const std::exception &e) {
+		std::cout << e.what() << std::endl;
+	}
+	try {
+		v6.reserve(2305843009213693950); // bad_alloc exception
+	} catch (const std::exception &e) {
+		std::cout << e.what() << std::endl;
+	}
 	// Range constructor
 	/*vector<float> v0(v3.begin(), v3.end());
 	std::cout << "v0 Range constructor: ";
