@@ -6,7 +6,7 @@
 /*   By: whazami <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 20:38:23 by whazami           #+#    #+#             */
-/*   Updated: 2022/05/18 16:44:47 by whazami          ###   ########.fr       */
+/*   Updated: 2022/05/20 18:29:33 by whazami          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,9 @@ namespace ft
 		void	operator++(int) {
 			this->p++;
 		}
+		vector_iterator operator+(int n) {
+			return this->p + n;
+		}
 		difference_type	operator-(vector_iterator rhs) {
 			return this->p - rhs.p;
 		}
@@ -59,6 +62,9 @@ namespace ft
 			if (this->p != rhs.p)
 				return true;
 			return false;
+		}
+		void print() {
+			std::cout << this->p << std::endl;
 		}
 
 	private:

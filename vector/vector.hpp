@@ -22,16 +22,17 @@ namespace ft
 		typedef typename	allocator_type::const_pointer		const_pointer;
 		typedef 			vector_iterator<value_type>			iterator;
 		typedef 			vector_iterator<const value_type>	const_iterator;
+		typedef typename	std::iterator_traits<iterator>::difference_type	difference_type;
 		typedef 			size_t								size_type;
 		
 
 		// Constructors & Destructor
 		explicit vector(const allocator_type& alloc = allocator_type())
-						: arr(NULL), alloc(alloc), sizee(0), capacityy(0) {}
+						: arr(NULL), alloc(alloc), sizee(0), capacityy(0), old_resize(0) {}
 
 		explicit vector(size_type n, const value_type& val = value_type(),
 						const allocator_type& alloc = allocator_type())
-						: arr(NULL), alloc(alloc), sizee(0), capacityy(0) {
+						: arr(NULL), alloc(alloc), sizee(0), capacityy(0), old_resize(0) {
 			this->assign(n, val);
 		}
 
@@ -39,11 +40,11 @@ namespace ft
 		/*template <class InputIterator>
 		vector(InputIterator first, InputIterator last,
 				const allocator_type& alloc = allocator_type())
-				: arr(NULL), alloc(alloc), sizee(0), capacityy(0) {
+				: arr(NULL), alloc(alloc), sizee(0), capacityy(0), old_resize(0) {
 				this->assign(first, last);
 		}*/
 
-		vector (const vector &x) : arr(NULL), sizee(0), capacityy(0) {
+		vector (const vector &x) : arr(NULL), sizee(0), capacityy(0), old_resize(0) {
 			*this = x;
 		}
 
@@ -83,6 +84,26 @@ namespace ft
 
 		size_type max_size() const {
 			return this->alloc.max_size();
+		}
+
+		void resize(size_type n, value_type val = value_type()) {
+			if (n < this->sizee)
+				for (size_t i = n; i < this->sizee; i++)
+					this->alloc.destroy(this->arr + i);
+			else {
+				if (n > this->capacityy) {
+					size_type new_capacity;
+					if (this->old_resize == 0 || n > this->old_resize * 2)
+						new_capacity = n;
+					else
+						new_capacity = this->old_resize * 2;
+					this->reallocate(new_capacity);
+				}
+				for (size_type i = this->sizee; i < n; i++)
+					this->alloc.construct(this->arr + i, val);
+			}
+			this->sizee = n;
+			this->old_resize = n;
 		}
 
 		size_type capacity() const {
@@ -188,11 +209,45 @@ namespace ft
 			this->sizee--;
 		}
 
+		iterator insert(iterator position, const value_type& val) {
+			if (this->sizee + 1 > this->capacityy)
+				this->reallocate(this->sizee + 1);
+			if (this->empty()) {
+				this->alloc.construct(this->arr, val);
+				this->sizee++;
+				return this->begin();
+			}
+			size_type id = position - this->begin();
+			for (size_type i = this->sizee; i > id; i--)
+				this->arr[i] = this->arr[i - 1];
+			this->alloc.construct(this->arr + id, val); // c'est la meme chose que "this->arr[id] = val", mais on ne peut pas faire ca au cas ou notre vector contient des objets
+			this->sizee++;
+			return position;
+		}
+		void insert(iterator position, size_type n, const value_type& val) {
+			if (this->sizee + n > this->capacityy)
+				this->reallocate(this->sizee + n);
+			if (this->empty()) {
+				for (size_type i = 0; i < n; i++)
+					this->alloc.construct(this->arr + i, val);
+				this->sizee += n;
+				return ;
+			}
+			size_type id = position - this->begin();
+			std::cout << id << std::endl;
+			for (size_type i = this->sizee + n - 1; i > id; i--)
+				this->arr[i] = this->arr[i - 1];
+			for (size_type i = 0; i < n; i++)
+				this->alloc.construct(this->arr + id + i, val);
+			this->sizee += n;
+		}
+
 	private:
 		pointer			arr;
 		allocator_type	alloc;
 		size_type		sizee;		// cause size already taken by method
 		size_type		capacityy;	// cause capacity already taken by method
+		size_type		old_resize;
 
 		// Allocation manager
 		void allocate(size_type n) {

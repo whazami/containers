@@ -8,6 +8,30 @@
 
 using namespace NAMESPACE;
 
+void print_capacity(vector<int> v)
+{
+	std::cout << v.size() << " " << v.capacity() << std::endl;
+}
+
+void resize_test(vector<int> v)
+{
+    std::cout << v.capacity() << std::endl;
+	v.resize(6);
+	std::cout << v.capacity() << std::endl;
+	v.resize(0);
+	std::cout << v.capacity() << std::endl;
+	v.resize(9, 100);
+	std::cout << v.capacity() << std::endl;
+	v.resize(13);
+	std::cout << v.capacity() << std::endl;
+	v.resize(27);
+	std::cout << v.capacity() << std::endl;
+											    
+	for (vector<int>::iterator it = v.begin(); it != v.end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;
+}
+
 int main()
 {
 	vector<int> v(3, 42);
@@ -110,6 +134,15 @@ int main()
 	for (vector<float>::iterator it = vvs[4].begin(); it != vvs[4].end(); it++)
 		std::cout << *it << " ";
 	std::cout << std::endl;
+	vvs[5].reserve(7);
+	std::cout << vvs[5].size() << " " << vvs[5].capacity() << std::endl;
+	vvs[6].resize(5, 100);
+	std::cout << vvs[6].size() << " " << vvs[6].capacity() << std::endl;
+	for (vector<float>::iterator it = vvs[6].begin(); it != vvs[6].end(); it++)
+		std::cout << *it << std::endl;
+	std::cout << "yooyoo test" << std::endl;
+	vvs[7].insert(vvs[7].begin(), 9);
+	std::cout << vvs[7].front() << std::endl;
 
 	// Should segfault
 	vector<float> vv;
@@ -128,17 +161,61 @@ int main()
 	std::cout << v6.size() << " " << v6.capacity() << std::endl;
 	for (vector<float>::iterator it = v6.begin(); it != v6.end(); it++)
 		std::cout << *it << std::endl;
-	try {
+	/*try {
 		v6.reserve(2305843009213693952); // length_error exception
 		std::cout << "vector max size: " << v6.max_size() << std::endl;
 	} catch (const std::exception &e) {
 		std::cout << e.what() << std::endl;
-	}
-	try {
+	}*/
+	/*try {
 		v6.reserve(2305843009213693950); // bad_alloc exception
 	} catch (const std::exception &e) {
 		std::cout << e.what() << std::endl;
-	}
+	}*/
+
+	// cplusplus resize test
+	vector<int> myvector;
+	// set some initial content:
+	for (int i=1;i<7;i++) myvector.push_back(i);
+
+	std::cout << myvector.size() << " " << myvector.capacity() << std::endl;
+	myvector.resize(5);
+	std::cout << myvector.size() << " " << myvector.capacity() << std::endl;
+	myvector.resize(8,100);
+	std::cout << myvector.size() << " " << myvector.capacity() << std::endl;
+	myvector.resize(12);
+	std::cout << myvector.size() << " " << myvector.capacity() << std::endl;
+
+	std::cout << "myvector contains:";
+	for (vector<int>::size_type i=0;i<myvector.size();i++)
+		std::cout << ' ' << myvector[i];
+	std::cout << '\n';
+
+	std::cout << "RESIZE: VOID TEST" << std::endl;
+	vector<int> vr;
+	resize_test(vr);
+				    
+	std::cout << "RESIZE: FILLED TEST" << std::endl;
+	vector<int> vr1(7);
+	for (vector<int>::size_type i = 1; i <= 7; i++)
+		vr1[i - 1] = i;
+	resize_test(vr1);
+
+	std::cout << "INSERT TESTS" << std::endl;
+	vector<int> v8(4, 42);
+	print_capacity(v8);
+	std::cout << *v8.insert(v8.begin() + 2, 99) << std::endl;
+	print_capacity(v8);
+	for (vector<int>::iterator it = v8.begin(); it != v8.end(); it++)
+		std::cout << *it << std::endl;
+	/*vector<int> v9(4, 42);
+	print_capacity(v9);
+	v9.insert(v9.begin() + 2, 4, 99);
+	print_capacity(v9);
+	std::cout << "v9 content" << std::endl;
+	for (vector<int>::iterator it = v9.begin(); it != v9.end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;*/
 	// Range constructor
 	/*vector<float> v0(v3.begin(), v3.end());
 	std::cout << "v0 Range constructor: ";
