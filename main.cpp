@@ -299,6 +299,18 @@ int main()
 	v18.clear();
 	print_capacity(v18);
 	v18.get_allocator();
+
+	std::cout << "Relation operator" << std::endl;
+	vector<int> v19(5, 19);
+	vector<int> v20(v19);
+	v19.push_back(19);
+	v20.push_back(20);
+	std::cout << (v19 == v20) << std::endl;
+	std::cout << (v19 != v20) << std::endl;
+	std::cout << (v19 <  v20) << std::endl;
+	std::cout << (v19 <= v20) << std::endl;
+	std::cout << (v19 >  v20) << std::endl;
+	std::cout << (v19 >= v20) << std::endl;
 	// Range constructor
 	/*vector<float> v0(v3.begin(), v3.end());
 	std::cout << "v0 Range constructor: ";

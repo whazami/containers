@@ -241,7 +241,7 @@ namespace ft
 				this->sizee += n;
 				return ;
 			}
-			for (size_type i = this->sizee + n - 1; i > id; i--)
+			for (size_type i = this->sizee + n - 1; i >= n; i--)
 				this->arr[i] = this->arr[i - n];
 			for (size_type i = 0; i < n; i++)
 				this->alloc.construct(this->arr + id + i, val);
@@ -262,7 +262,7 @@ namespace ft
 				this->sizee += extra_size;
 				return ;
 			}
-			for (size_type i = this->sizee + extra_size - 1; i > id; i--)
+			for (size_type i = this->sizee + extra_size - 1; i >= extra_size; i--)
 				this->arr[i] = this->arr[i - extra_size];
 			size_type i = 0;
 			for (InputIterator it = first; it != last; it++, i++)
@@ -373,6 +373,37 @@ namespace ft
 			return what;
 		}
 	};
+
+	// Relational operators
+	template <class T, class Alloc>
+	bool operator==(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+		if (lhs.size() != rhs.size())
+			return false;
+		for (typename vector<T>::size_type i = 0; i < lhs.size(); i++)
+			if (lhs[i] != rhs[i])
+				return false;
+		return true;
+	}
+	template <class T, class Alloc>
+	bool operator!=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+		return !(lhs == rhs);
+	}
+	template <class T, class Alloc>
+	bool operator<(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+		return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+	}
+	template <class T, class Alloc>
+	bool operator<=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+		return !(rhs < lhs);
+	}
+	template <class T, class Alloc>
+	bool operator>(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+		return rhs < lhs;
+	}
+	template <class T, class Alloc>
+	bool operator>=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
+		return !(lhs < rhs);
+	}
 
 	template <class T, class Alloc>
 	void swap(vector<T, Alloc>& x, vector<T, Alloc>& y) {

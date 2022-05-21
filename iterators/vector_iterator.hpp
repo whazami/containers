@@ -6,7 +6,7 @@
 /*   By: whazami <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 20:38:23 by whazami           #+#    #+#             */
-/*   Updated: 2022/05/20 18:29:33 by whazami          ###   ########.fr       */
+/*   Updated: 2022/05/21 22:03:13 by whazami          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,14 @@ namespace ft
 		value_type	operator*() const {
 			return *this->p;
 		}
-		void	operator++(int) {
+		vector_iterator &operator++() { // pre incrementation
 			this->p++;
+			return *this;
+		}
+		vector_iterator	operator++(int) { // post incrementation
+			vector_iterator tmp(*this);
+			this->operator++();
+			return tmp;
 		}
 		vector_iterator operator+(int n) {
 			return this->p + n;
@@ -58,10 +64,13 @@ namespace ft
 		vector_iterator operator-(int n) {
 			return this->p - n;
 		}
-		bool	operator!=(vector_iterator rhs) {
-			if (this->p != rhs.p)
+		bool	operator==(vector_iterator rhs) {
+			if (this->p == rhs.p)
 				return true;
 			return false;
+		}
+		bool	operator!=(vector_iterator rhs) {
+			return !(*this == rhs);
 		}
 		void print() {
 			std::cout << this->p << std::endl;
