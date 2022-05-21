@@ -143,6 +143,11 @@ int main()
 	std::cout << "yooyoo test" << std::endl;
 	vvs[7].insert(vvs[7].begin(), 9);
 	std::cout << vvs[7].front() << std::endl;
+	vvs[8].insert(vvs[8].begin(), 5, 21.f);
+	std::cout << vvs[8].size() << " " << vvs[8].capacity() << std::endl;
+	for (vector<float>::iterator it = vvs[8].begin(); it != vvs[8].end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;
 
 	// Should segfault
 	vector<float> vv;
@@ -166,8 +171,8 @@ int main()
 		std::cout << "vector max size: " << v6.max_size() << std::endl;
 	} catch (const std::exception &e) {
 		std::cout << e.what() << std::endl;
-	}*/
-	/*try {
+	}
+	try {
 		v6.reserve(2305843009213693950); // bad_alloc exception
 	} catch (const std::exception &e) {
 		std::cout << e.what() << std::endl;
@@ -208,14 +213,92 @@ int main()
 	print_capacity(v8);
 	for (vector<int>::iterator it = v8.begin(); it != v8.end(); it++)
 		std::cout << *it << std::endl;
-	/*vector<int> v9(4, 42);
+	vector<int> v9(4, 42);
 	print_capacity(v9);
-	v9.insert(v9.begin() + 2, 4, 99);
+	v9.insert(v9.begin() + 2, 4, 99); // segfault with fsanitize
 	print_capacity(v9);
 	std::cout << "v9 content" << std::endl;
 	for (vector<int>::iterator it = v9.begin(); it != v9.end(); it++)
 		std::cout << *it << " ";
+	std::cout << std::endl;
+	/*vector<int> v10(4, 42);
+	print_capacity(v10);
+	v10.insert(v10.begin() + 2, v9.begin(), v9.end());
+	print_capacity(v10);
+	std::cout << "v10 content" << std::endl;
+	for (vector<int>::iterator it = v10.begin(); it != v10.end(); it++)
+		std::cout << *it << " ";
 	std::cout << std::endl;*/
+
+	std::cout << "data() tests" << std::endl;
+	vector<int>::value_type *p1 = v8.data();
+	const vector<int>::value_type *p2 = vc.data();
+	vector<int>::pointer p3 = v8.data();
+	std::cout << p1[0] << " " << p2[1] << " " << p3[2] << std::endl;
+
+	std::cout << "erase tests" << std::endl;
+	vector<int> v11;
+	for (int i = 0; i < 5; i++)
+		v11.push_back(i + 1);
+	print_capacity(v11);
+	std::cout << *v11.erase(v11.begin() + 2) << std::endl;
+	print_capacity(v11);
+	for (vector<int>::iterator it = v11.begin(); it != v11.end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;
+	vector<int> v12;
+	for (int i = 0; i < 8; i++)
+		v12.push_back(i + 1);
+	print_capacity(v12);
+	std::cout << *v12.erase(v12.begin() + 2, v12.begin() + 5) << std::endl;
+	print_capacity(v12);
+	for (vector<int>::iterator it = v12.begin(); it != v12.end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;
+
+	std::cout << "swap tests" << std::endl;
+	vector<int> v13(3, 100);
+	vector<int> v14;
+	print_capacity(v13);
+	print_capacity(v14);
+	v13.swap(v14);
+	print_capacity(v13);
+	print_capacity(v14);
+	for (vector<int>::iterator it = v13.begin(); it != v13.end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;
+	//std::cout << *v13.end() << std::endl;
+	for (vector<int>::iterator it = v14.begin(); it != v14.end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;
+	std::cout << *v14.end() << std::endl; // segfault with fsanitize
+
+	vector<int> v15(3, 100);
+	vector<int> v16(5, 200);
+	print_capacity(v15);
+	print_capacity(v16);
+	swap(v15, v16);
+	print_capacity(v15);
+	print_capacity(v16);
+	for (vector<int>::iterator it = v15.begin(); it != v15.end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;
+	std::cout << *v15.end() << std::endl;
+	for (vector<int>::iterator it = v16.begin(); it != v16.end(); it++)
+		std::cout << *it << " ";
+	std::cout << std::endl;
+	std::cout << *v16.end() << std::endl;
+
+	vector<int> v17;
+	print_capacity(v17);
+	v17.clear();
+	print_capacity(v17);
+
+	vector<int> v18(5, 2);
+	print_capacity(v18);
+	v18.clear();
+	print_capacity(v18);
+	v18.get_allocator();
 	// Range constructor
 	/*vector<float> v0(v3.begin(), v3.end());
 	std::cout << "v0 Range constructor: ";

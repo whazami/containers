@@ -154,6 +154,13 @@ namespace ft
 			return arr[sizee - 1];
 		}
 
+		value_type* data() {
+			return this->arr;
+		}
+		const value_type* data() const {
+			return this->arr;
+		}
+
 		// Modifiers
 		template <class InputIterator>
 		void assign(InputIterator first, InputIterator last) {
@@ -210,6 +217,7 @@ namespace ft
 		}
 
 		iterator insert(iterator position, const value_type& val) {
+			size_type id = position - this->begin();
 			if (this->sizee + 1 > this->capacityy)
 				this->reallocate(this->sizee + 1);
 			if (this->empty()) {
@@ -217,14 +225,14 @@ namespace ft
 				this->sizee++;
 				return this->begin();
 			}
-			size_type id = position - this->begin();
 			for (size_type i = this->sizee; i > id; i--)
 				this->arr[i] = this->arr[i - 1];
-			this->alloc.construct(this->arr + id, val); // c'est la meme chose que "this->arr[id] = val", mais on ne peut pas faire ca au cas ou notre vector contient des objets
+			this->alloc.construct(this->arr + id, val);
 			this->sizee++;
-			return position;
+			return this->begin() + id;
 		}
 		void insert(iterator position, size_type n, const value_type& val) {
+			size_type id = position - this->begin();
 			if (this->sizee + n > this->capacityy)
 				this->reallocate(this->sizee + n);
 			if (this->empty()) {
@@ -233,13 +241,82 @@ namespace ft
 				this->sizee += n;
 				return ;
 			}
-			size_type id = position - this->begin();
-			std::cout << id << std::endl;
 			for (size_type i = this->sizee + n - 1; i > id; i--)
-				this->arr[i] = this->arr[i - 1];
+				this->arr[i] = this->arr[i - n];
 			for (size_type i = 0; i < n; i++)
 				this->alloc.construct(this->arr + id + i, val);
 			this->sizee += n;
+		}
+		/*template <class InputIterator>
+		void insert(iterator position, InputIterator first, InputIterator last) {
+			size_type id = position - this->begin();
+			size_type extra_size = 0;
+			for (InputIterator it = first; it != last; it++)
+				extra_size++;
+			if (this->sizee + extra_size > this->capacityy)
+				this->reallocate(this->sizee + extra_size);
+			if (this->empty()) {
+				size_type i = 0;
+				for (InputIterator it = first; it != last; it++, i++)
+					this->alloc.construct(this->arr + i, *it);
+				this->sizee += extra_size;
+				return ;
+			}
+			for (size_type i = this->sizee + extra_size - 1; i > id; i--)
+				this->arr[i] = this->arr[i - extra_size];
+			size_type i = 0;
+			for (InputIterator it = first; it != last; it++, i++)
+				this->alloc.construct(this->arr + id + i, *it);
+			this->sizee += extra_size;
+		}*/
+
+		iterator erase(iterator position) {
+			size_type id = position - this->begin();
+			this->alloc.destroy(this->arr + id);
+			for (size_type i = id; i < this->sizee - 1; i++)
+				this->arr[i] = this->arr[i + 1];
+			this->sizee--;
+			return this->begin() + id;
+		}
+		iterator erase(iterator first, iterator last) {
+			size_type size_loss = 0;
+			for (iterator it = first; it != last; it++) {
+				this->alloc.destroy(this->arr + (it - this->begin()));
+				size_loss++;
+			}
+			for (size_type i = first - this->begin(); i < this->sizee - size_loss; i++)
+				this->arr[i] = this->arr[i + size_loss];
+			this->sizee -= size_loss;
+			return this->begin() + (first - this->begin());
+		}
+
+		void swap(vector& x) {
+			pointer tmp = (this->sizee != 0) ? this->alloc.allocate(this->sizee) : NULL;
+			for (size_t i = 0; i < this->sizee; i++)
+				this->alloc.construct(tmp + i, this->arr[i]);
+			this->deallocate();
+			this->allocate(x.sizee);
+			for (size_t i = 0; i < x.sizee; i++)
+				this->alloc.construct(this->arr + i, x.arr[i]);
+			x.deallocate();
+			x.allocate(this->sizee);
+			for (size_t i = 0; i < this->sizee; i++)
+				x.alloc.construct(x.arr + i, tmp[i]);
+			this->deallocate(tmp, this->sizee);
+			size_type tmp_size = this->sizee;
+			this->sizee = x.sizee;
+			x.sizee = tmp_size;
+		}
+
+		void clear() {
+			for (size_t i = 0; i < this->sizee; i++)
+				this->alloc.destroy(this->arr + i);
+			this->sizee = 0;
+		}
+
+		// Allocator
+		allocator_type get_allocator() const {
+			return this->alloc;
 		}
 
 	private:
@@ -253,8 +330,8 @@ namespace ft
 		void allocate(size_type n) {
 			if (n > this->max_size())
 				throw std::length_error("vector::reserve");
+			this->arr = NULL;
 			if (n > this->capacityy) {
-				this->arr = NULL;
 				this->arr = (n != 0) ? this->alloc.allocate(n) : NULL;
 				this->capacityy = n;
 			}
@@ -296,6 +373,11 @@ namespace ft
 			return what;
 		}
 	};
+
+	template <class T, class Alloc>
+	void swap(vector<T, Alloc>& x, vector<T, Alloc>& y) {
+		x.swap(y);
+	}
 }
 
 #endif // VECTOR_HPP
