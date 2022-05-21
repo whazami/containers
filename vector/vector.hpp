@@ -247,6 +247,7 @@ namespace ft
 				this->alloc.construct(this->arr + id + i, val);
 			this->sizee += n;
 		}
+		// Needs enable_if
 		/*template <class InputIterator>
 		void insert(iterator position, InputIterator first, InputIterator last) {
 			size_type id = position - this->begin();
