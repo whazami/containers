@@ -3,8 +3,10 @@
 
 #ifdef MINE
 	#include "../vector/vector.hpp"
+	#include "../utils/is_integral.hpp"
 #else
 	#include <vector>
+	#include <type_traits>
 #endif
 
 using namespace NAMESPACE;
