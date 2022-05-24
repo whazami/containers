@@ -2,7 +2,8 @@
 NAME		= ft_containers
 REAL		= real
 
-SRCS		= main_test.cpp
+SRCS_DIR	= mains/
+SRCS		= main.cpp
 
 OBJS_D		= objs/
 OBJS_D_R	= objs_r/
@@ -16,10 +17,10 @@ CXX			= c++ #-g3 -fsanitize=address
 CXXFLAGS	= -Wall -Wextra -Werror -std=c++98 -pedantic
 RM			= rm -f
 
-${OBJS_D}%.o: %.cpp ${HEADERS}
+${OBJS_D}%.o: ${SRCS_DIR}%.cpp ${HEADERS}
 		mkdir -p ${OBJS_D}
 		${CXX} ${CXXFLAGS} -D NAMESPACE="ft" -D MINE="1" -c $< -o $@
-${OBJS_D_R}%.o: %.cpp
+${OBJS_D_R}%.o: ${SRCS_DIR}%.cpp
 		mkdir -p ${OBJS_D_R}
 		${CXX} ${CXXFLAGS} -D NAMESPACE="std" -c $< -o $@
 
