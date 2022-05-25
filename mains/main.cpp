@@ -3,10 +3,8 @@
 
 #ifdef MINE
 	#include "../vector/vector.hpp"
-	#include "../utils/is_integral.hpp"
 #else
 	#include <vector>
-	#include <type_traits>
 #endif
 
 using namespace NAMESPACE;
@@ -274,7 +272,7 @@ int main()
 	for (vector<int>::iterator it = v14.begin(); it != v14.end(); it++)
 		std::cout << *it << " ";
 	std::cout << std::endl;
-	std::cout << *v14.end() << std::endl; // segfault with fsanitize
+	//std::cout << *v14.end() << std::endl; // segfault with fsanitize
 
 	vector<int> v15(3, 100);
 	vector<int> v16(5, 200);
@@ -286,11 +284,11 @@ int main()
 	for (vector<int>::iterator it = v15.begin(); it != v15.end(); it++)
 		std::cout << *it << " ";
 	std::cout << std::endl;
-	std::cout << *v15.end() << std::endl;
+	//std::cout << *v15.end() << std::endl;
 	for (vector<int>::iterator it = v16.begin(); it != v16.end(); it++)
 		std::cout << *it << " ";
 	std::cout << std::endl;
-	std::cout << *v16.end() << std::endl;
+	//std::cout << *v16.end() << std::endl;
 
 	vector<int> v17;
 	print_capacity(v17);

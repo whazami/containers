@@ -204,10 +204,8 @@ namespace ft
 				else
 					new_capacity *= 2;
 				this->reallocate(new_capacity);
-				this->alloc.construct(this->arr + this->sizee, val);
 			}
-			else
-				this->alloc.construct(this->arr + this->sizee, val);
+			this->alloc.construct(this->arr + this->sizee, val);
 			this->sizee++;
 		}
 
@@ -229,7 +227,7 @@ namespace ft
 				this->arr[i] = this->arr[i - 1];
 			this->alloc.construct(this->arr + id, val);
 			this->sizee++;
-			return this->begin() + id;
+			return position;
 		}
 		void insert(iterator position, size_type n, const value_type& val) {
 			size_type id = position - this->begin();
@@ -277,7 +275,7 @@ namespace ft
 			for (size_type i = id; i < this->sizee - 1; i++)
 				this->arr[i] = this->arr[i + 1];
 			this->sizee--;
-			return this->begin() + id;
+			return position;
 		}
 		iterator erase(iterator first, iterator last) {
 			size_type size_loss = 0;
@@ -288,7 +286,7 @@ namespace ft
 			for (size_type i = first - this->begin(); i < this->sizee - size_loss; i++)
 				this->arr[i] = this->arr[i + size_loss];
 			this->sizee -= size_loss;
-			return this->begin() + (first - this->begin());
+			return first;
 		}
 
 		void swap(vector& x) {
@@ -333,7 +331,7 @@ namespace ft
 				throw std::length_error("vector::reserve");
 			this->arr = NULL;
 			if (n > this->capacityy) {
-				this->arr = (n != 0) ? this->alloc.allocate(n) : NULL;
+				this->arr = this->alloc.allocate(n);
 				this->capacityy = n;
 			}
 		}

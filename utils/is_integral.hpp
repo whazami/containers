@@ -2,26 +2,25 @@
 #define IS_INTEGRAL_HPP
 
 #include <iostream>
-#include <type_traits>
 
 namespace ft
 {
-	template <class T>
-	class is_integral
-	{
-		public:
-			typedef bool value_type;
-			static value_type value;
-
-			is_integral() {
-			}
-
-		private:
-			std::integral_constant<int, 0> ic;
+	template <typename T, typename U>
+	struct is_same {
+		static const bool value = false;
+	};
+	template <typename T>
+	struct is_same<T, T> {
+		static const bool value = true;
 	};
 
 	template <class T>
-	typename is_integral<T>::value_type is_integral<T>::value = false;
+	struct is_integral
+	{
+			typedef bool	value_type;
+			
+			const static value_type value = ft::is_same<T, int>::value;
+	};
 }
 
 #endif // IS_INTEGRAL_HPP
