@@ -7,6 +7,10 @@
 # include <stdexcept>
 # include <typeinfo>
 # include "../iterators/vector_iterator.hpp"
+# include "../utils/iterator_traits.hpp"
+# include "../utils/lexicographical_compare.hpp"
+# include "../utils/enable_if.hpp"
+# include "../utils/is_integral.hpp"
 
 namespace ft
 {
@@ -14,16 +18,16 @@ namespace ft
 	class vector
 	{
 	public:
-		typedef 			T									value_type;
-		typedef 			Alloc								allocator_type;
-		typedef	typename	allocator_type::reference			reference;		
-		typedef typename	allocator_type::const_reference		const_reference;
-		typedef	typename	allocator_type::pointer				pointer;
-		typedef typename	allocator_type::const_pointer		const_pointer;
-		typedef 			vector_iterator<value_type>			iterator;
-		typedef 			vector_iterator<const value_type>	const_iterator;
-		typedef typename	std::iterator_traits<iterator>::difference_type	difference_type;
-		typedef 			size_t								size_type;
+		typedef 			T												value_type;
+		typedef 			Alloc											allocator_type;
+		typedef	typename	allocator_type::reference						reference;		
+		typedef typename	allocator_type::const_reference					const_reference;
+		typedef	typename	allocator_type::pointer							pointer;
+		typedef typename	allocator_type::const_pointer					const_pointer;
+		typedef 			vector_iterator<value_type>						iterator;
+		typedef 			vector_iterator<const value_type>				const_iterator;
+		typedef typename	ft::iterator_traits<iterator>::difference_type	difference_type;
+		typedef 			size_t											size_type;
 		
 
 		// Constructors & Destructor
@@ -36,13 +40,13 @@ namespace ft
 			this->assign(n, val);
 		}
 
-		// Needs enable_if
-		/*template <class InputIterator>
+		template <class InputIterator>
 		vector(InputIterator first, InputIterator last,
-				const allocator_type& alloc = allocator_type())
+				const allocator_type& alloc = allocator_type(),
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = NULL)
 				: arr(NULL), alloc(alloc), sizee(0), capacityy(0), old_resize(0) {
 				this->assign(first, last);
-		}*/
+		}
 
 		vector (const vector &x) : arr(NULL), sizee(0), capacityy(0), old_resize(0) {
 			*this = x;
@@ -163,7 +167,8 @@ namespace ft
 
 		// Modifiers
 		template <class InputIterator>
-		void assign(InputIterator first, InputIterator last) {
+		void assign(InputIterator first, InputIterator last,
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = NULL) {
 			size_t new_size = 0;
 			for (InputIterator it = first; it != last; it++)
 				new_size++;
@@ -245,9 +250,9 @@ namespace ft
 				this->alloc.construct(this->arr + id + i, val);
 			this->sizee += n;
 		}
-		// Needs enable_if
-		/*template <class InputIterator>
-		void insert(iterator position, InputIterator first, InputIterator last) {
+		template <class InputIterator>
+		void insert(iterator position, InputIterator first, InputIterator last,
+				typename ft::enable_if<!ft::is_integral<InputIterator>::value, InputIterator>::type* = NULL) {
 			size_type id = position - this->begin();
 			size_type extra_size = 0;
 			for (InputIterator it = first; it != last; it++)
@@ -267,7 +272,7 @@ namespace ft
 			for (InputIterator it = first; it != last; it++, i++)
 				this->alloc.construct(this->arr + id + i, *it);
 			this->sizee += extra_size;
-		}*/
+		}
 
 		iterator erase(iterator position) {
 			size_type id = position - this->begin();
@@ -389,7 +394,7 @@ namespace ft
 	}
 	template <class T, class Alloc>
 	bool operator<(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {
-		return std::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+		return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
 	}
 	template <class T, class Alloc>
 	bool operator<=(const vector<T, Alloc>& lhs, const vector<T, Alloc>& rhs) {

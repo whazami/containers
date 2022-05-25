@@ -222,14 +222,14 @@ int main()
 	for (vector<int>::iterator it = v9.begin(); it != v9.end(); it++)
 		std::cout << *it << " ";
 	std::cout << std::endl;
-	/*vector<int> v10(4, 42);
+	vector<int> v10(4, 42);
 	print_capacity(v10);
 	v10.insert(v10.begin() + 2, v9.begin(), v9.end());
 	print_capacity(v10);
 	std::cout << "v10 content" << std::endl;
 	for (vector<int>::iterator it = v10.begin(); it != v10.end(); it++)
 		std::cout << *it << " ";
-	std::cout << std::endl;*/
+	std::cout << std::endl;
 
 	std::cout << "data() tests" << std::endl;
 	vector<int>::value_type *p1 = v8.data();
@@ -313,11 +313,11 @@ int main()
 	std::cout << (v19 >  v20) << std::endl;
 	std::cout << (v19 >= v20) << std::endl;
 	// Range constructor
-	/*vector<float> v0(v3.begin(), v3.end());
+	vector<float> v0(v3.begin(), v3.end());
 	std::cout << "v0 Range constructor: ";
 	for (vector<float>::iterator it = v0.begin(); it != v0.end(); it++)
 	std::cout << *it << " ";
-	std::cout << std::endl;*/
+	std::cout << std::endl;
 	return (0);
 }
 

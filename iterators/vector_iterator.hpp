@@ -6,7 +6,7 @@
 /*   By: whazami <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/05/12 20:38:23 by whazami           #+#    #+#             */
-/*   Updated: 2022/05/24 20:01:06 by whazami          ###   ########.fr       */
+/*   Updated: 2022/05/25 08:50:30 by whazami          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,21 @@
 # define VECTOR_ITERATOR_HPP
 
 # include <iostream>
+# include <iterator>
 
 namespace ft
 {
-	template <	class T,											// iterator::value_type
-				class Category = std::random_access_iterator_tag,	// iterator::iterator_category
-				class Distance = std::ptrdiff_t,					// iterator::difference_type
-				class Pointer = T*,									// iterator::pointer
-				class Reference = T&>								// iterator::reference
-	class vector_iterator
+	template <class T>
+	class vector_iterator : public std::iterator<std::random_access_iterator_tag, T>
 	{
+	private:
+		typedef typename std::iterator<std::random_access_iterator_tag, T> iterator;
 	public:
-		typedef T			value_type;			// Type of the elements pointed by the iterator
-		typedef Distance	difference_type;	// Type to represent the difference between two iterators
-		typedef Pointer		pointer;			// Type to represent a pointer to an element pointed by the iterator
-		typedef Reference	reference;			// Type to represent a reference to an element pointed by the iterator
-		typedef Category	iterator_category;	// Category to which the iterator belongs to.
+		typedef typename iterator::value_type			value_type;
+		typedef typename iterator::difference_type		difference_type;
+		typedef typename iterator::pointer				pointer;
+		typedef typename iterator::reference			reference;
+		typedef typename iterator::iterator_category	iterator_category;
 		
 		// Canonical form
 		vector_iterator() : p(NULL) {}
@@ -135,9 +134,8 @@ namespace ft
 		pointer	p;	
 	};
 	
-	template <class T, class Category, class Distance, class Pointer, class Reference>
-	vector_iterator<T, Category, Distance, Pointer, Reference>
-	operator+(int n, vector_iterator<T, Category, Distance, Pointer, Reference> vit) {
+	template <class T>
+	vector_iterator<T> operator+(int n, vector_iterator<T> vit) {
 		return vit + n;
 	}
 }
