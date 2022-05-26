@@ -2,8 +2,8 @@
 NAME		= ft_containers
 REAL		= real
 
-SRCS_DIR	= mains/mli/
-SRCS		= ite_arrow.cpp
+SRCS_DIR	= mains/mine/
+SRCS		= yooyoo.cpp
 
 OBJS_D		= objs/
 OBJS_D_R	= objs_r/

@@ -11,7 +11,6 @@ namespace ft
 	{
 	private:
 		typedef typename std::iterator<std::random_access_iterator_tag, T> iterator;
-		typedef const T*								const_pointer;
 	public:
 		typedef typename iterator::value_type			value_type;
 		typedef typename iterator::difference_type		difference_type;

@@ -232,7 +232,7 @@ namespace ft
 				this->arr[i] = this->arr[i - 1];
 			this->alloc.construct(this->arr + id, val);
 			this->sizee++;
-			return position;
+			return this->begin() + id;
 		}
 		void insert(iterator position, size_type n, const value_type& val) {
 			size_type id = position - this->begin();
