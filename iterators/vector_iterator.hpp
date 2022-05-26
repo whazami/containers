@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   vector_iterator.hpp                                :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: whazami <marvin@42.fr>                     +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2022/05/12 20:38:23 by whazami           #+#    #+#             */
-/*   Updated: 2022/05/25 08:50:30 by whazami          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef VECTOR_ITERATOR_HPP
 # define VECTOR_ITERATOR_HPP
 
@@ -23,6 +11,7 @@ namespace ft
 	{
 	private:
 		typedef typename std::iterator<std::random_access_iterator_tag, T> iterator;
+		typedef const T*								const_pointer;
 	public:
 		typedef typename iterator::value_type			value_type;
 		typedef typename iterator::difference_type		difference_type;
@@ -40,17 +29,26 @@ namespace ft
 			this->p = it.p;
 			return *this;
 		}
+		template <typename U>
+		operator vector_iterator<const U>() const {
+			vector_iterator<const U> ret((const U*)this->p);
+			return ret;
+		}
 
 		/// OPERATORS
 		// Equality Comparisons
-		bool operator==(vector_iterator rhs) const {
+		bool operator==(const vector_iterator& rhs) const {
 			if (this->p == rhs.p)
 				return true;
 			return false;
 		}
-		bool operator!=(vector_iterator rhs) const {
+		bool operator!=(const vector_iterator& rhs) const {
 			return !(*this == rhs);
 		}
+		template <typename U, typename V>
+		friend bool operator==(const vector_iterator<U>& lhs, const vector_iterator<V>& rhs);
+		template <typename U, typename V>
+		friend bool operator!=(const vector_iterator<U>& lhs, const vector_iterator<V>& rhs);
 
 		// Dereferencing
 		value_type operator*() const {
@@ -90,25 +88,36 @@ namespace ft
 		vector_iterator operator-(int n) const {
 			return this->p - n;
 		}
-		difference_type	operator-(vector_iterator rhs) const {
+		difference_type operator-(const vector_iterator& rhs) const {
 			return this->p - rhs.p;
 		}
+		template <typename U, typename V>
+		friend typename vector_iterator<U>::difference_type operator-(
+					const vector_iterator<U>& lhs, const vector_iterator<V>& rhs);
 
 		// Inequality Comparisons
-		bool operator<(vector_iterator rhs) const {
+		bool operator<(const vector_iterator& rhs) const {
 			if (this->p < rhs.p)
 				return true;
 			return false;
 		}
-		bool operator>(vector_iterator lhs) const {
-			return (lhs < *this);
+		bool operator>(const vector_iterator& rhs) const {
+			return (rhs < *this);
 		}
-		bool operator<=(vector_iterator lhs) const {
-			return (*this < lhs || *this == lhs);
+		bool operator<=(const vector_iterator& rhs) const {
+			return (*this < rhs || *this == rhs);
 		}
-		bool operator>=(vector_iterator lhs) const {
-			return (lhs < *this || *this == lhs);
+		bool operator>=(const vector_iterator& rhs) const {
+			return (rhs < *this || *this == rhs);
 		}
+		template <typename U, typename V>
+		friend bool operator<(const vector_iterator<U>& lhs, const vector_iterator<V>& rhs);
+		template <typename U, typename V>
+		friend bool operator>(const vector_iterator<U>& lhs, const vector_iterator<V>& rhs);
+		template <typename U, typename V>
+		friend bool operator<=(const vector_iterator<U>& lhs, const vector_iterator<V>& rhs);
+		template <typename U, typename V>
+		friend bool operator>=(const vector_iterator<U>& lhs, const vector_iterator<V>& rhs);
 
 		// Increment & Decrement assigment
 		vector_iterator &operator+=(const int n) {
@@ -137,6 +146,42 @@ namespace ft
 	template <class T>
 	vector_iterator<T> operator+(int n, vector_iterator<T> vit) {
 		return vit + n;
+	}
+
+	template <typename T, typename U>
+	bool operator==(const vector_iterator<T>& lhs, const vector_iterator<U>& rhs) {
+		if (lhs.p == rhs.p)
+			return true;
+		return false;
+	}
+	template <typename T, typename U>
+	bool operator!=(const vector_iterator<T>& lhs, const vector_iterator<U>& rhs) {
+		return !(lhs == rhs);
+	}
+	
+	template <typename T, typename U>
+	typename vector_iterator<T>::difference_type operator-(
+				const vector_iterator<T>& lhs, const vector_iterator<U>& rhs) {
+		return lhs.p - rhs.p;
+	}
+
+	template <typename T, typename U>
+	bool operator<(const vector_iterator<T>& lhs, const vector_iterator<U>& rhs) {
+		if (lhs.p < rhs.p)
+			return true;
+		return false;
+	}
+	template <typename T, typename U>
+	bool operator>(const vector_iterator<T>& lhs, const vector_iterator<U>& rhs) {
+		return (rhs < lhs);
+	}
+	template <typename T, typename U>
+	bool operator<=(const vector_iterator<T>& lhs, const vector_iterator<U>& rhs) {
+		return (lhs < rhs || lhs == rhs);
+	}
+	template <typename T, typename U>
+	bool operator>=(const vector_iterator<T>& lhs, const vector_iterator<U>& rhs) {
+		return (rhs < lhs || lhs == rhs);
 	}
 }
 

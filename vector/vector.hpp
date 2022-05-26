@@ -244,7 +244,7 @@ namespace ft
 				this->sizee += n;
 				return ;
 			}
-			for (size_type i = this->sizee + n - 1; i >= n; i--)
+			for (size_type i = this->sizee + n - 1; i >= id + n; i--)
 				this->arr[i] = this->arr[i - n];
 			for (size_type i = 0; i < n; i++)
 				this->alloc.construct(this->arr + id + i, val);
@@ -266,7 +266,7 @@ namespace ft
 				this->sizee += extra_size;
 				return ;
 			}
-			for (size_type i = this->sizee + extra_size - 1; i >= extra_size; i--)
+			for (size_type i = this->sizee + extra_size - 1; i >= id + extra_size; i--)
 				this->arr[i] = this->arr[i - extra_size];
 			size_type i = 0;
 			for (InputIterator it = first; it != last; it++, i++)
@@ -295,21 +295,15 @@ namespace ft
 		}
 
 		void swap(vector& x) {
-			pointer tmp = (this->sizee != 0) ? this->alloc.allocate(this->sizee) : NULL;
-			for (size_t i = 0; i < this->sizee; i++)
-				this->alloc.construct(tmp + i, this->arr[i]);
-			this->deallocate();
-			this->allocate(x.sizee);
-			for (size_t i = 0; i < x.sizee; i++)
-				this->alloc.construct(this->arr + i, x.arr[i]);
-			x.deallocate();
-			x.allocate(this->sizee);
-			for (size_t i = 0; i < this->sizee; i++)
-				x.alloc.construct(x.arr + i, tmp[i]);
-			this->deallocate(tmp, this->sizee);
+			pointer	tmp = this->arr;
+			this->arr = x.arr;
+			x.arr = tmp;
 			size_type tmp_size = this->sizee;
 			this->sizee = x.sizee;
 			x.sizee = tmp_size;
+			size_type tmp_capacity = this->capacityy;
+			this->capacityy = x.capacityy;
+			x.capacityy = tmp_capacity;
 		}
 
 		void clear() {

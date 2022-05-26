@@ -2,12 +2,12 @@
 #include <string>
 
 #ifdef MINE
-	#include "../vector/vector.hpp"
+	#include "../../vector/vector.hpp"
 #else
 	#include <vector>
 #endif
 
-using namespace ft;
+using namespace NAMESPACE;
 
 void printSize(vector<int> v) {
 	std::cout << v.size() << " " << v.capacity() << std::endl;
