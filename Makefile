@@ -2,15 +2,16 @@
 NAME		= ft_containers
 REAL		= real
 
-SRCS_DIR	= mains/mine/
-SRCS		= yooyoo.cpp
+SRCS_DIR	= mains/utils/
+SRCS		= main_pair.cpp
 
 OBJS_D		= objs/
 OBJS_D_R	= objs_r/
 OBJS		= ${SRCS:%.cpp=${OBJS_D}%.o}
 OBJS_R		= ${SRCS:%.cpp=${OBJS_D_R}%.o}
 
-HEADERS		= vector/vector.hpp \
+HEADERS		= containers/vector.hpp \
+			  containers/map.hpp \
 			  iterators/vector_iterator.hpp
 
 CXX			= c++ -g3 -fsanitize=address

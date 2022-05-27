@@ -1,8 +1,7 @@
 #include <iostream>
-#include <string>
 
 #ifdef MINE
-	#include "../../vector/vector.hpp"
+	#include "../../../containers/vector.hpp"
 #else
 	#include <vector>
 #endif

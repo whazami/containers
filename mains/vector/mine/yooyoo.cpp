@@ -2,7 +2,7 @@
 #include <iostream>
 
 #ifdef MINE
-	#include "../../vector/vector.hpp"
+	#include "../../../containers/vector.hpp"
 #else
 	#include <vector>
 #endif
