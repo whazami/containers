@@ -5,14 +5,14 @@
 # include <functional>
 # include "../utils/iterator_traits.hpp"
 # include "../utils/pair.hpp"
-// # include "../iterators/map_iterator.hpp"
+# include "../iterators/map_iterator.hpp"
 // # include "../iterators/reverse_iterator.hpp"
 
 namespace ft
 {
 	template <	class Key, class T,
 				class Compare = std::less<Key>, 
-				class Alloc = allocator<ft::pair<const Key, T> > >
+				class Alloc = std::allocator<ft::pair<const Key, T> > >
 	class map
 	{
 	public:
@@ -28,8 +28,8 @@ namespace ft
 		typedef typename	allocator_type::const_pointer					const_pointer;
 		typedef				map_iterator<value_type>						iterator;
 		typedef				map_iterator<const value_type>					const_iterator;
-		typedef typename	ft::reverse_iterator<iterator>					reverse_iterator;
-		typedef typename	ft::reverse_iterator<const_iterator>			const_reverse_iterator;
+		/*typedef typename	ft::reverse_iterator<iterator>					reverse_iterator;
+		typedef typename	ft::reverse_iterator<const_iterator>			const_reverse_iterator;*/
 		typedef typename	ft::iterator_traits<iterator>::difference_type	difference_type;
 		typedef				size_t											size_type;
 
