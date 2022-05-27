@@ -319,7 +319,3 @@ int main()
 	std::cout << std::endl;
 	return (0);
 }
-
-// apres avoir fini ce main, tu peux faire l'operator= et le constructeur de copie
-// (qui sont codes par defaut par le c++, donc n'hesite pas a ajouter des cout dedans
-// pour verifier qu'il vient bien dans le tien)

@@ -2,8 +2,8 @@
 NAME		= ft_containers
 REAL		= real
 
-SRCS_DIR	= mains/map/mine/
-SRCS		= main.cpp
+SRCS_DIR	= mains/
+SRCS		= all.cpp
 
 OBJS_D		= objs/
 OBJS_D_R	= objs_r/
@@ -47,6 +47,12 @@ test:
 			echo "\033[92m  Success!\033[0m";\
 		fi;\
 		exit 0
+		@echo "\033[93m\n--- TIME ---"
+		@echo -n "\033[96mstd: "
+		@ts=$$(date +%s%N) ; ./${REAL} > /dev/null ; tt=$$((($$(date +%s%N) - $$ts)/1000000)) ; echo "$$tt ms"
+		@echo -n "\033[92mft: "
+		@ts=$$(date +%s%N) ; ./${NAME} > /dev/null ; tt=$$((($$(date +%s%N) - $$ts)/1000000)) ; echo "$$tt ms"
+		@echo -n "\033[0m"
 
 clean:
 		rm -rf ${OBJS_D} ${OBJS_D_R}
