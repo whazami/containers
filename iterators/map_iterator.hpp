@@ -83,7 +83,7 @@ namespace ft
 	private:
 		pointer	p;	
 	};
-	
+
 	template <typename T, typename U>
 	bool operator==(const map_iterator<T>& lhs, const map_iterator<U>& rhs) {
 		if (lhs.p == rhs.p)

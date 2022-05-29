@@ -48,7 +48,7 @@ namespace ft
 				this->assign(first, last);
 		}
 
-		vector (const vector &x) : arr(NULL), sizee(0), capacityy(0), old_resize(0) {
+		vector (const vector &x) : arr(NULL), alloc(x.alloc), sizee(0), capacityy(0), old_resize(0) {
 			*this = x;
 		}
 
@@ -354,8 +354,8 @@ namespace ft
 			this->allocate(new_capacity);
 			for (size_t i = 0; i < this->sizee; i++)
 				this->alloc.construct(this->arr + i, tmp[i]);
-			for (size_t i = this->sizee; i < new_capacity; i++)
-				this->alloc.construct(this->arr + i, value_type());
+			/*for (size_t i = this->sizee; i < new_capacity; i++)  // pas sur
+				this->alloc.construct(this->arr + i, value_type());*/
 			this->deallocate(tmp, this->sizee);
 		}
 

@@ -1,0 +1,40 @@
+
+			void erase() {
+				Node *p = this->left ? this->left : this->right;
+				if (!p) { // I have no children
+					std::cout << "No children: " << this->pair.first << std::endl;
+					this->changeParentPOV(this, NULL);
+					this->deallocate(this);
+					return ;
+				}
+				if (p == this->right) {
+					std::cout << "Only right: " << this->pair.first << std::endl;
+					this->changeParentPOV(this, &this->right);
+					this->deallocate(this);
+					return ;
+				}
+				while (p->right)
+					p = p->right;
+				if (p == this->left && !this->right) {
+					std::cout << "Only left: " << this->pair.first << std::endl;
+					this->changeParentPOV(this, &this->left);
+					this->deallocate(this);
+					return ;
+				}
+				bool leftBut = (p == this->left && this->right);
+				const value_type print_pair = this->pair;
+				if (leftBut)
+					std::cout << "Left & Right: " << print_pair.first << std::endl;
+				this->pair = p->pair;
+				if (p->left) {
+					if(!leftBut)
+						std::cout << "Left then right (right have left): " << print_pair.first << std::endl;
+					this->changeParentPOV(p, &p->left);
+				}
+				else {
+					if (!leftBut)
+						std::cout << "Left then right (right dont have left): " << print_pair.first << std::endl;
+					this->changeParentPOV(p, NULL);
+				}
+				this->deallocate(p);
+			}
