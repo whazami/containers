@@ -10,7 +10,8 @@ using namespace NAMESPACE;
 
 int main()
 {
-	
+	map<char, int> m;
+	(void)m;
 
 	return 0;
 }

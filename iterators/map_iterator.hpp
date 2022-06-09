@@ -22,6 +22,7 @@ namespace ft
 		
 		// Canonical form
 		map_iterator() : node(NULL) {}
+		map_iterator(const node_ptr& node) : node(node) {}
 		map_iterator(const map_iterator &it) {
 			*this = it;
 		}
@@ -29,11 +30,10 @@ namespace ft
 			this->node = it.node;
 			return *this;
 		}
-		/*template <typename U>
-		operator map_iterator<const U>() const {
-			map_iterator<const U> ret((map_iterator<const U>)*this); // a revoir
-			return ret;
-		}*/
+		template <class U, typename Node2>
+		operator map_iterator<const U, Node2>() const {
+			return map_iterator<const U, Node2>(this->node);
+		}
 
 		/// OPERATORS
 		// Equality Comparisons
@@ -45,10 +45,12 @@ namespace ft
 		bool operator!=(const map_iterator& rhs) const {
 			return !(*this == rhs);
 		}
-		template <typename U, typename V>
-		friend bool operator==(const map_iterator<U>& lhs, const map_iterator<V>& rhs);
-		template <typename U, typename V>
-		friend bool operator!=(const map_iterator<U>& lhs, const map_iterator<V>& rhs);
+		template <class U, typename Node2, class V, typename Node3>
+		friend bool operator==(const map_iterator<U, Node2>& lhs,
+								const map_iterator<V, Node3>& rhs);
+		template <class U, typename Node2, class V, typename Node3>
+		friend bool operator!=(const map_iterator<U, Node2>& lhs,
+								const map_iterator<V, Node3>& rhs);
 
 		// Dereferencing
 		value_type operator*() const {
@@ -63,13 +65,7 @@ namespace ft
 
 		// Increment & Decrement
 		map_iterator &operator++() { // Pre-incrementation
-			map_iterator end(this->node->end());
-			if (*this == end)
-				*this = 
 			this->node = this->node->next();
-			if (!this->node) {
-				*this = end;
-			}
 			return *this;
 		}
 		map_iterator	operator++(int) { // Post-incrementation
@@ -89,18 +85,18 @@ namespace ft
 
 	private:
 		node_ptr	node;
-
-		map_iterator(const node_ptr& node) : node(node) {}
 	};
 
-	template <typename T, typename U>
-	bool operator==(const map_iterator<T>& lhs, const map_iterator<U>& rhs) {
+	template <class U, typename Node2, class V, typename Node3>
+	bool operator==(const map_iterator<U, Node2>& lhs,
+					const map_iterator<V, Node3>& rhs) {
 		if (lhs.node == rhs.node)
 			return true;
 		return false;
 	}
-	template <typename T, typename U>
-	bool operator!=(const map_iterator<T>& lhs, const map_iterator<U>& rhs) {
+	template <class U, typename Node2, class V, typename Node3>
+	bool operator!=(const map_iterator<U, Node2>& lhs,
+					const map_iterator<V, Node3>& rhs) {
 		return !(lhs == rhs);
 	}
 }

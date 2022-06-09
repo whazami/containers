@@ -2,8 +2,8 @@
 NAME		= ft_containers
 REAL		= real
 
-SRCS_DIR	= mains/
-SRCS		= all.cpp
+SRCS_DIR	= mains/map/mine/
+SRCS		= main.cpp
 
 OBJS_D		= objs/
 OBJS_D_R	= objs_r/

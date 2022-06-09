@@ -37,7 +37,65 @@ namespace ft
 		typedef typename	ft::iterator_traits<iterator>::difference_type	difference_type;
 		typedef				size_t											size_type;
 
+		// Constructors & Destructor
+		explicit map(const key_compare& comp = key_compare(),
+						const allocator_type& alloc = allocator_type())
+		: bt(ft::make_pair(comp, alloc)) {}
+
+		template <class InputIterator>
+		map(InputIterator first, InputIterator last,
+			const key_compare& comp = key_compare(),
+			const allocator_type& alloc = allocator_type())
+		: bt(ft::make_pair(comp, alloc)) {
+			for (InputIterator it = first; it != last; it++)
+				bt.insert(*it);
+		}
+
+		map(const map& x) {
+			*this = x;
+		}
+
+		map& operator=(const map& x) {
+			this->bt = x.bt;
+		}
+
+		~map() {}
+
+		// Iterators
+		iterator begin() {
+			return iterator(this->bt.begin());
+		}
+		const_iterator begin() const {
+			const_iterator ret(this->bt.begin());
+			return ret;
+		}
+		iterator end() {
+			return iterator(this->bt.end());
+		}
+		const_iterator end() const {
+			const_iterator ret(this->bt.end());
+			return ret;
+		}
+
+		// Capacity
+		bool empty() const {
+			return (this->bt.size() == 0);
+		}
+		size_type size() const {
+			return this->bt.size();
+		}
+		size_type max_size() const {
+			return this->alloc.max_size();
+		}
+
+		// Element access
+		mapped_type& operator[](const key_type& k) {
+			this->bt.insert(ft::make_pair(k, mapped_type()));
+			mapped_type& ret = this->bt.insert
+		}
+
 	private:
+		bt_type bt;
 	};
 }
 

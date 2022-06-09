@@ -22,29 +22,36 @@ namespace ft
 
 			// Constructor & Destructors
 			Node(const map_traits_type& map_traits, const value_type& pair)
-			: left(NULL), right(NULL), parent(NULL), pair(pair),
+			: left(NULL), right(NULL), parent(NULL), end(false), pair(pair),
 			  compare(map_traits.first), alloc(map_traits.second) {}
 
 			Node(Node *parent, const map_traits_type& map_traits, const value_type& pair)
-			: left(NULL), right(NULL), parent(parent), pair(pair),
+			: left(NULL), right(NULL), parent(parent), end(false), pair(pair),
 			  compare(map_traits.first), alloc(map_traits.second) {}
 
-			Node(const Node &other)
-			: left(other.left), right(other.right), parent(other.parent),
-			  pair(other.pair), compare(other.compare), alloc(other.alloc) {}
+			Node() : left(NULL), right(NULL), parent(NULL), end(true),
+					 pair(value_type()), compare(Compare()), alloc(allocator_type())
+			{}
+
+			Node(const Node &other) : left(other.left), right(other.right),
+				parent(other.parent), end(other.end), pair(other.pair),
+				compare(other.compare), alloc(other.alloc) {}
 
 			Node& operator=(const Node& other) {
 				this->left = other.left;
 				this->right = other.right;
 				this->parent = other.parent;
+				this->end = other.end;
 				this->pair = other.pair;
 				this->compare = other.compare;
 				return *this;
 			}
 
 			~Node() {
-				this->deallocate(this->left);
-				this->deallocate(this->right);
+				if (this->left && !this->left->end)
+					this->deallocate(this->left);
+				if (this->right && !this->right->end)
+					this->deallocate(this->right);
 			}
 
 			// Operators
@@ -54,6 +61,10 @@ namespace ft
 			bool operator!=(const Node& other) const { return !(*this == other); }
 			bool operator!=(const value_type& pair) const { return  !(*this == pair); }
 			bool operator!=(const key_type& key) const { return !(*this == key); }
+			bool operator<(const value_type& pair) const
+			{ return this->pair.first < pair.first; }
+			bool operator>(const value_type& pair) const
+			{ return this->pair.first > pair.first; }
 
 			value_type operator*() const {
 				return this->pair;
@@ -72,8 +83,9 @@ namespace ft
 			Node* next() const {
 				if (this->right) {
 					Node* p = this->right;
-					while (p->left)
-						p = p->left;
+					if (!p->end)
+						while (p->left)
+							p = p->left;
 					return p;
 				} else {
 					Node* p = this->parent;
@@ -90,7 +102,7 @@ namespace ft
 				}
 				bool left = this->compare(pair.first, this->pair.first);
 				Node *child = left ? this->left : this->right;
-				if (!child)
+				if (!child || (child && child->end))
 					this->createChild(pair, left);
 				else
 					child->add(pair);
@@ -116,7 +128,6 @@ namespace ft
 			}
 
 			Node *begin() const {
-				if (this - this->alloc.max_size
 				Node* p = this;
 				while (p->parent)
 					p = p->parent;
@@ -125,15 +136,12 @@ namespace ft
 				return p;
 			}
 
-			Node* end() const {
-				return this->begin() + this->alloc.max_size();
-			}
-
 		private:
 			// Links to the tree
 			Node			*left;
 			Node			*right;
 			Node			*parent;
+			bool			end;
 
 			// Data
 			value_type		pair;
@@ -225,8 +233,17 @@ namespace ft
 		void insert(const value_type& pair) {
 			if (!this->root)
 				this->createRoot(pair);
-			else
+			else {
 				this->root->add(pair);
+				if (this->end.parent < pair) {
+					this->end.left->right->right = &this->end;
+					this->end.left = this->end.left->right;
+				}
+				if (this->end.right > pair) {
+					this->end.right->left->left = &this->end;
+					this->end.right = this->end.right->left;
+				}
+			}
 			this->sizee++;
 		}
 
@@ -248,12 +265,23 @@ namespace ft
 			return ret;
 		}
 
+		p_node_type *begin() const {
+			if (!this->root)
+				return NULL;
+			return this->root->begin();
+		}
+
+		p_node_type *end() const {
+			return &this->end;
+		}
+
 		size_type size() const {
 			return this->sizee;
 		}
 
 	private:
 		p_node_type*	root;
+		p_node_type		end;
 		size_type		sizee;
 		map_traits_type	map_traits;
 
@@ -261,11 +289,17 @@ namespace ft
 		void createRoot(const value_type& pair) {
 			this->root = this->map_traits.second.allocate(1);
 			this->map_traits.second.construct(this->root, p_node_type(this->map_traits, pair));
+			this->root->right = &this->end;
+			this->end.left = this->root;
+			this->root->left = &this->end;
+			this->end.right = this->root;
 		}
 		void deleteRoot() {
 			if (this->root)
 				this->map_traits.second.destroy(this->root);
 			this->map_traits.second.deallocate(this->root, 1);
+			this->end.right = NULL;
+			this->end.left = NULL;
 		}
 	};
 }
