@@ -3,14 +3,16 @@
 
 # include <iostream>
 # include <iterator>
+# include "../utils/BinaryTree.hpp"
 
 namespace ft
 {
-	template <class T>
+	template <class T, typename Node>
 	class map_iterator : public std::iterator<std::bidirectional_iterator_tag, T>
 	{
 	private:
-		typedef typename std::iterator<std::bidirectional_iterator_tag, T> iterator;
+		typedef typename std::iterator<std::bidirectional_iterator_tag, T>	iterator;
+		typedef Node*														node_ptr;
 	public:
 		typedef typename iterator::value_type			value_type;
 		typedef typename iterator::difference_type		difference_type;
@@ -19,25 +21,24 @@ namespace ft
 		typedef typename iterator::iterator_category	iterator_category;
 		
 		// Canonical form
-		map_iterator() : p(NULL) {}
-		map_iterator(pointer p) : p(p) {}
+		map_iterator() : node(NULL) {}
 		map_iterator(const map_iterator &it) {
 			*this = it;
 		}
 		map_iterator	&operator=(const map_iterator& it) {
-			this->p = it.p;
+			this->node = it.node;
 			return *this;
 		}
-		template <typename U>
+		/*template <typename U>
 		operator map_iterator<const U>() const {
-			map_iterator<const U> ret((const U*)this->p);
+			map_iterator<const U> ret((map_iterator<const U>)*this); // a revoir
 			return ret;
-		}
+		}*/
 
 		/// OPERATORS
 		// Equality Comparisons
 		bool operator==(const map_iterator& rhs) const {
-			if (this->p == rhs.p)
+			if (this->node == rhs.node)
 				return true;
 			return false;
 		}
@@ -51,18 +52,24 @@ namespace ft
 
 		// Dereferencing
 		value_type operator*() const {
-			return *this->p;
+			return **this->node;
 		}
 		value_type *operator->() {
-			return this->p;
+			return &(**this->node);
 		}
 		value_type &operator*() { // Dereferencing as an lvalue
-			return *this->p;
+			return **this->node;
 		}
 
 		// Increment & Decrement
 		map_iterator &operator++() { // Pre-incrementation
-			this->p++;
+			map_iterator end(this->node->end());
+			if (*this == end)
+				*this = 
+			this->node = this->node->next();
+			if (!this->node) {
+				*this = end;
+			}
 			return *this;
 		}
 		map_iterator	operator++(int) { // Post-incrementation
@@ -71,7 +78,7 @@ namespace ft
 			return tmp;
 		}
 		map_iterator &operator--() { // Pre-decrementation
-			this->p--;
+			// a faire
 			return *this;
 		}
 		map_iterator	operator--(int) { // Post-decrementation
@@ -81,12 +88,14 @@ namespace ft
 		}
 
 	private:
-		pointer	p;	
+		node_ptr	node;
+
+		map_iterator(const node_ptr& node) : node(node) {}
 	};
 
 	template <typename T, typename U>
 	bool operator==(const map_iterator<T>& lhs, const map_iterator<U>& rhs) {
-		if (lhs.p == rhs.p)
+		if (lhs.node == rhs.node)
 			return true;
 		return false;
 	}

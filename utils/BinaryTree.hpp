@@ -55,13 +55,32 @@ namespace ft
 			bool operator!=(const value_type& pair) const { return  !(*this == pair); }
 			bool operator!=(const key_type& key) const { return !(*this == key); }
 
-			mapped_type operator*() const {
-				return this->pair.second;
+			value_type operator*() const {
+				return this->pair;
+			}
+			value_type *operator->() {
+				return &this->pair;
+			}
+			value_type &operator*() {		// lvalue
+				return this->pair;
 			}
 
 			// Methods
 			Node* next(const key_type& key) const {
 				return this->compare(key, this->pair.first) ? this->left : this->right;
+			}
+			Node* next() const {
+				if (this->right) {
+					Node* p = this->right;
+					while (p->left)
+						p = p->left;
+					return p;
+				} else {
+					Node* p = this->parent;
+					while (p && this->parent->pair.first < this->pair.first)
+						p = p->parent;
+					return p;
+				}
 			}
 
 			void add(const value_type& pair) {
@@ -77,19 +96,37 @@ namespace ft
 					child->add(pair);
 			}
 
-			void erase() {
-				Node *p = this->left ? this->left : this->right;
-				if (this->relinkToChild(p, NULL))
-					return ;
-				if (this->relinkToChild(p, &this->right))
-					return ;
+			Node* erase() {
+				Node *p = this->left ? this->left : this->right, *ret;
+				if (this->relinkToChild(p, NULL))								// No children
+					return NULL;
+				if ((ret = this->relinkToChild(p, &this->right)))				// Only right
+					return ret;
 				while (p->right)
 					p = p->right;
-				if (this->relinkToChild(p, &this->left, !this->right))
-					return ;
-				this->pair = p->pair;
+				if ((ret = this->relinkToChild(p, &this->left, !this->right)))	// Only left
+					return ret;
+				Node *newRoot = p;
+				while (newRoot->parent)
+					newRoot = newRoot->parent;
+				this->pair = p->pair;											// Both
 				this->changeParentPOV(p, p->left ? &p->left : NULL);
 				this->deallocate(p);
+				return newRoot;
+			}
+
+			Node *begin() const {
+				if (this - this->alloc.max_size
+				Node* p = this;
+				while (p->parent)
+					p = p->parent;
+				while (p->left)
+					p = p->left;
+				return p;
+			}
+
+			Node* end() const {
+				return this->begin() + this->alloc.max_size();
 			}
 
 		private:
@@ -131,13 +168,23 @@ namespace ft
 				p->right = NULL;
 			}
 
-			bool relinkToChild(Node *p, Node **child, bool additionalCond = true) {
+			Node* relinkToChild(Node *p, Node **child, bool additionalCond = true) {
 				if (p == (child ? *child : NULL) && additionalCond) {
-					this->changeParentPOV(this, child);
-					this->deallocate(this);
-					return true;
+					if (p && !p->parent->parent) { // if we're erasing the root and it has one and only one child
+						*child = NULL;
+						this->deallocate(p->parent);
+						p->parent = NULL;
+					} else {
+						this->changeParentPOV(this, child);
+						this->deallocate(this);
+					}
+					if (!p)
+						return this;
+					while (p->parent)
+						p = p->parent;
+					return p;
 				}
-				return false;
+				return NULL;
 			}
 		};
 	}
@@ -160,14 +207,14 @@ namespace ft
 
 		// Constructors & Destructors
 		BinaryTree(const typename ft::pair<key_compare, Alloc>& map_traits)
-		: root(NULL), size(0), map_traits(map_traits) {}
+		: root(NULL), sizee(0), map_traits(map_traits) {}
 		BinaryTree(const BinaryTree& other)
-		: root(NULL), size(0), map_traits(other.map_traits) {
+		: root(NULL), sizee(0), map_traits(other.map_traits) {
 			*this = other;
 		}
 		BinaryTree& operator=(const BinaryTree& other) {
 			this->root = other.root;
-			this->size = other.size;
+			this->sizee = other.sizee;
 			this->map_traits.first = other.map_traits.first;
 		}
 		~BinaryTree() {
@@ -180,15 +227,17 @@ namespace ft
 				this->createRoot(pair);
 			else
 				this->root->add(pair);
-			this->size++;
+			this->sizee++;
 		}
 
 		bool erase(const key_type& key) {
 			p_node_type *p = this->find(key);
 			if (!p)
 				return false;
-			p->erase();
-			this->size--;
+			p_node_type *newRoot = p->erase();
+			this->root = newRoot ? newRoot : this->root;
+			if (--this->sizee == 0)
+				this->root = NULL;
 			return true;
 		}
 
@@ -199,9 +248,13 @@ namespace ft
 			return ret;
 		}
 
+		size_type size() const {
+			return this->sizee;
+		}
+
 	private:
 		p_node_type*	root;
-		size_type		size;
+		size_type		sizee;
 		map_traits_type	map_traits;
 
 		// Allocation Manager

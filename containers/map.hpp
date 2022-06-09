@@ -7,6 +7,7 @@
 # include "../utils/pair.hpp"
 # include "../iterators/map_iterator.hpp"
 // # include "../iterators/reverse_iterator.hpp"
+# include "../utils/BinaryTree.hpp"
 
 namespace ft
 {
@@ -15,6 +16,9 @@ namespace ft
 				class Alloc = std::allocator<ft::pair<const Key, T> > >
 	class map
 	{
+	private:
+		typedef typename	ft::BinaryTree<Key, T, Compare, Alloc>			bt_type;
+		typedef typename	bt_type::node_type								node_type;
 	public:
 		typedef				Key												key_type;
 		typedef				T												mapped_type;
@@ -26,8 +30,8 @@ namespace ft
 		typedef typename	allocator_type::const_reference					const_reference;
 		typedef typename	allocator_type::pointer							pointer;
 		typedef typename	allocator_type::const_pointer					const_pointer;
-		typedef				map_iterator<value_type>						iterator;
-		typedef				map_iterator<const value_type>					const_iterator;
+		typedef				map_iterator<value_type, node_type>				iterator;
+		typedef				map_iterator<const value_type, node_type>		const_iterator;
 		/*typedef typename	ft::reverse_iterator<iterator>					reverse_iterator;
 		typedef typename	ft::reverse_iterator<const_iterator>			const_reverse_iterator;*/
 		typedef typename	ft::iterator_traits<iterator>::difference_type	difference_type;
