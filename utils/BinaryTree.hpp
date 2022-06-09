@@ -8,6 +8,14 @@ namespace ft
 {
 	namespace
 	{
+		/* --- Some forward declarations for non-member method 'isLeaf' --- */
+		template <class Key, class T, class Compare, class Alloc>
+		class Node;
+
+		template <class Key, class T, class Compare, class Alloc>
+		bool isLeaf(Node<Key, T, Compare, Alloc> *node);
+		/* --- -------------------------------------------------------- --- */
+
 		template <class Key, class T, class Compare, class Alloc>
 		class Node
 		{
@@ -15,7 +23,7 @@ namespace ft
 			typedef				Key											key_type;
 			typedef				T											mapped_type;
 			typedef				Compare										key_compare;
-			typedef typename	ft::pair<key_type, mapped_type>				value_type;
+			typedef typename	ft::pair<const key_type, mapped_type>		value_type;
 			typedef typename	Alloc::template rebind<Node<key_type,
 								mapped_type, key_compare, Alloc> >::other	allocator_type;
 			typedef typename	ft::pair<key_compare, allocator_type>		map_traits_type;
@@ -48,10 +56,8 @@ namespace ft
 			}
 
 			~Node() {
-				if (this->left && !this->left->end)
-					this->deallocate(this->left);
-				if (this->right && !this->right->end)
-					this->deallocate(this->right);
+				this->deallocate(this->left);
+				this->deallocate(this->right);
 			}
 
 			// Operators
@@ -61,10 +67,6 @@ namespace ft
 			bool operator!=(const Node& other) const { return !(*this == other); }
 			bool operator!=(const value_type& pair) const { return  !(*this == pair); }
 			bool operator!=(const key_type& key) const { return !(*this == key); }
-			bool operator<(const value_type& pair) const
-			{ return this->pair.first < pair.first; }
-			bool operator>(const value_type& pair) const
-			{ return this->pair.first > pair.first; }
 
 			value_type operator*() const {
 				return this->pair;
@@ -81,31 +83,33 @@ namespace ft
 				return this->compare(key, this->pair.first) ? this->left : this->right;
 			}
 			Node* next() const {
+				Node *p;
 				if (this->right) {
-					Node* p = this->right;
+					p = this->right;
 					if (!p->end)
-						while (p->left)
+						while (!isLeaf(p->left))
 							p = p->left;
-					return p;
 				} else {
-					Node* p = this->parent;
+					p = this->parent;
 					while (p && this->parent->pair.first < this->pair.first)
 						p = p->parent;
-					return p;
 				}
+				return p;
 			}
 
-			void add(const value_type& pair) {
+			Node* add(const value_type& pair) {
 				if (this->pair.first == pair.first) {
 					this->pair.second = pair.second;
-					return;
+					return this;
 				}
 				bool left = this->compare(pair.first, this->pair.first);
 				Node *child = left ? this->left : this->right;
-				if (!child || (child && child->end))
+				if (!child || (child && child->end)) {
 					this->createChild(pair, left);
+					return left ? this->left : this->right;
+				}
 				else
-					child->add(pair);
+					return child->add(pair);
 			}
 
 			Node* erase() {
@@ -127,14 +131,39 @@ namespace ft
 				return newRoot;
 			}
 
-			Node *begin() const {
+			Node *begin() {
 				Node* p = this;
 				while (p->parent)
 					p = p->parent;
-				while (p->left)
+				while (!isLeaf(p->left))
 					p = p->left;
 				return p;
 			}
+
+			// node -> end
+			// this -> p
+			void loop(Node *node, bool checkOrder) {
+				if (!checkOrder || node->left->pair.first < this->pair.first) {
+					this->right = node;
+					node->left = this;
+				}
+				if (!checkOrder || node->right->pair.first > this->pair.first) {
+					this->left = node;
+					node->right = this;
+				}
+			}
+
+			// Specific function for end node
+			void unlink() {
+				if (this->left)
+					this->left->right = NULL;
+				if (this->right)
+					this->right->left = NULL;
+				this->right = NULL;
+				this->left = NULL;
+			}
+
+			friend bool isLeaf<Key, T, Compare, Alloc>(Node *node);
 
 		private:
 			// Links to the tree
@@ -195,6 +224,11 @@ namespace ft
 				return NULL;
 			}
 		};
+
+		template <class Key, class T, class Compare, class Alloc>
+		bool isLeaf(Node<Key, T, Compare, Alloc> *node) {
+			return !node || node->end;
+		}
 	}
 
 	template <class Key, class T, class Compare, class Alloc>
@@ -208,7 +242,7 @@ namespace ft
 	private:
 		typedef 			Node<key_type, mapped_type, key_compare, Alloc>	p_node_type;
 	public:
-		typedef 			const p_node_type								node_type;
+		typedef 			p_node_type								node_type;
 		typedef typename	Alloc::template rebind<p_node_type>::other		allocator_type;
 		typedef typename	ft::pair<key_compare, allocator_type>			map_traits_type;
 		typedef 			size_t											size_type;
@@ -224,27 +258,24 @@ namespace ft
 			this->root = other.root;
 			this->sizee = other.sizee;
 			this->map_traits.first = other.map_traits.first;
+			return *this;
 		}
 		~BinaryTree() {
 			this->deleteRoot();
 		}
 
 		// Methods
-		void insert(const value_type& pair) {
-			if (!this->root)
-				this->createRoot(pair);
-			else {
-				this->root->add(pair);
-				if (this->end.parent < pair) {
-					this->end.left->right->right = &this->end;
-					this->end.left = this->end.left->right;
-				}
-				if (this->end.right > pair) {
-					this->end.right->left->left = &this->end;
-					this->end.right = this->end.right->left;
-				}
-			}
+		p_node_type* insert(const value_type& pair) {
 			this->sizee++;
+			if (!this->root) {
+				this->createRoot(pair);
+				return this->root;
+			}
+			else {
+				p_node_type *p = this->root->add(pair);
+				p->loop(&this->endd, true);
+				return p;
+			}
 		}
 
 		bool erase(const key_type& key) {
@@ -258,11 +289,11 @@ namespace ft
 			return true;
 		}
 
-		p_node_type *find(const key_type& key) {
+		p_node_type *find(const key_type& key) const {
 			p_node_type *ret = this->root;
-			while (ret && *ret != key)
+			while (!isLeaf(ret) && *ret != key)
 				ret = ret->next(key);
-			return ret;
+			return isLeaf(ret) ? NULL : ret;
 		}
 
 		p_node_type *begin() const {
@@ -271,8 +302,9 @@ namespace ft
 			return this->root->begin();
 		}
 
-		p_node_type *end() const {
-			return &this->end;
+		p_node_type *end() {
+			p_node_type *ret = &this->endd;
+			return ret;
 		}
 
 		size_type size() const {
@@ -281,7 +313,7 @@ namespace ft
 
 	private:
 		p_node_type*	root;
-		p_node_type		end;
+		p_node_type		endd;
 		size_type		sizee;
 		map_traits_type	map_traits;
 
@@ -289,17 +321,13 @@ namespace ft
 		void createRoot(const value_type& pair) {
 			this->root = this->map_traits.second.allocate(1);
 			this->map_traits.second.construct(this->root, p_node_type(this->map_traits, pair));
-			this->root->right = &this->end;
-			this->end.left = this->root;
-			this->root->left = &this->end;
-			this->end.right = this->root;
+			this->root->loop(&this->endd, false);
 		}
 		void deleteRoot() {
+			this->endd.unlink();
 			if (this->root)
 				this->map_traits.second.destroy(this->root);
 			this->map_traits.second.deallocate(this->root, 1);
-			this->end.right = NULL;
-			this->end.left = NULL;
 		}
 	};
 }

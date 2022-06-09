@@ -3,6 +3,7 @@
 
 # include <iostream>
 # include <functional>
+# include <stdexcept>
 # include "../utils/iterator_traits.hpp"
 # include "../utils/pair.hpp"
 # include "../iterators/map_iterator.hpp"
@@ -51,12 +52,13 @@ namespace ft
 				bt.insert(*it);
 		}
 
-		map(const map& x) {
+		map(const map& x) : bt(x.bt) {
 			*this = x;
 		}
 
 		map& operator=(const map& x) {
 			this->bt = x.bt;
+			return *this;
 		}
 
 		~map() {}
@@ -90,8 +92,25 @@ namespace ft
 
 		// Element access
 		mapped_type& operator[](const key_type& k) {
-			this->bt.insert(ft::make_pair(k, mapped_type()));
-			mapped_type& ret = this->bt.insert
+			node_type *p = this->bt.find(k);
+			if (!p)
+				p = this->bt.insert(ft::make_pair(k, mapped_type()));
+			value_type& val = **p;
+			return val.second;
+		}
+		mapped_type& at(const key_type& k) {
+			node_type *p = this->bt.find(k);
+			if (!p)
+				throw std::out_of_range("map::at");
+			value_type& val = **p;
+			return val.second;
+		}
+		const mapped_type& at(const key_type& k) const {
+			node_type *p = this->bt.find(k);
+			if (!p)
+				throw std::out_of_range("map::at");
+			value_type& val = **p;
+			return val.second;
 		}
 
 	private:
