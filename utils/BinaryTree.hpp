@@ -56,17 +56,6 @@ namespace ft
 				}
 			}
 
-			/*Node& operator=(const Node& other) {
-				if (!isLeaf(other.left))
-					this->createChild(other.left->pair, true);
-				if (!isLeaf(other.right))
-					this->createChild(other.right->pair, false);
-				this->end = other.end;
-				//this->pair = other.pair;
-				this->compare = other.compare;
-				return *this;
-			}*/
-
 			~Node() {
 				this->deallocate(this->left);
 				this->deallocate(this->right);
@@ -112,6 +101,7 @@ namespace ft
 			Node* add(const value_type& pair) {
 				if (this->pair.first == pair.first) {
 					this->pair.second = pair.second;
+					std::cout << "/!\\ Has entered the forbidden zone /!\\";
 					return this;
 				}
 				bool left = this->compare(pair.first, this->pair.first);
@@ -341,7 +331,7 @@ namespace ft
 		}
 
 	private:
-		node_type*	root;
+		node_type*		root;
 		node_type		endd;
 		node_type		*end_ptr; // for const
 		size_type		sizee;

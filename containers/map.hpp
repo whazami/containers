@@ -113,6 +113,39 @@ namespace ft
 			return val.second;
 		}
 
+		// Modifiers
+		ft::pair<iterator, bool> insert(const value_type& val) {
+			node_type *p = this->bt.find(val.first);
+			bool newElement = (p == NULL);
+			if (newElement)
+				p = this->bt.insert(val);
+			return ft::make_pair(iterator(p), newElement);
+		}
+		iterator insert(iterator position, const value_type& val) {
+			value_type pos_val = *position;
+			node_type *p;
+			if ((p = this->bt.find(val.first)))
+				return iterator(p);
+			p = this->bt.find(pos_val.first);
+			if (p) {
+				bool goodHint = true;
+				position--;
+				if (position->first > val.first)
+					goodHint = false;
+				position++;
+				position++;
+				if (position->first < val.first)
+					goodHint = false;
+				position--;
+				if (goodHint) {
+					p = p->add(val);
+					return iterator(p);
+				}
+			}
+			p = this->bt.insert(val);
+			return iterator(p);
+		}
+
 	private:
 		bt_type bt;
 	};

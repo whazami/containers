@@ -36,10 +36,32 @@ int main()
 	m['o'] = 10;
 	m['w'] = 90;
 
+	std::cout << std::boolalpha;
+	pair<map<char, int>::iterator, bool> ret = m.insert(make_pair('h', 216));
+	std::cout << "insert ret: " << ret.first->first << " " << ret.first->second << ", " << ret.second << std::endl;
+	ret = m.insert(make_pair('h', 212));
+	std::cout << "insert ret: " << ret.first->first << " " << ret.first->second << ", " << ret.second << std::endl;
+
+	map<char, int>::iterator ret2 = m.insert(m.begin(), make_pair('w', 99));
+	std::cout << "2nd insert ret: ";
+	std::cout << ret2->first << " " << ret2->second << std::endl;
+	map<char, int> m2(m);
+	ret2 = m.insert(m2.begin(), make_pair('w', 99));
+	std::cout << "2nd insert ret: ";
+	std::cout << ret2->first << " " << ret2->second << std::endl;
+	// Should segfault
+	/*map<char, int>::iterator nil;
+	ret2 = m.insert(nil, make_pair('w', 99));
+	std::cout << "2nd insert ret: ";
+	std::cout << ret2->first << " " << ret2->second << std::endl;*/
+
 	for (map<char, int>::iterator it = m.begin(); it != m.end(); it++)
 		std::cout << it->first << " " << it->second << std::endl;
 	std::cout << std::endl;
 	for (map<char, int>::const_iterator it = mc.begin(); it != mc.end(); it++)
 		std::cout << it->first << " " << it->second << std::endl;
+
+	std::cout << "m size: " << m.size() << std::endl;
+	std::cout << "mc size: " << mc.size() << std::endl;
 	return 0;
 }
