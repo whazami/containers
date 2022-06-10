@@ -14,7 +14,7 @@ HEADERS		= containers/vector.hpp \
 			  containers/map.hpp \
 			  iterators/vector_iterator.hpp
 
-CXX			= c++ #-g3 -fsanitize=address
+CXX			= c++ -g3 -fsanitize=address
 CXXFLAGS	= -Wall -Wextra -Werror -std=c++98 -pedantic
 RM			= rm -f
 

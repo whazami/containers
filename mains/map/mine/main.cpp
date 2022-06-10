@@ -18,19 +18,28 @@ int main()
 	m['d'] = 3;
 	m['e'];
 
-	for (map<char, int>::iterator it = m.begin(); it != m.end(); it++)
-		std::cout << it->first << " " << it->second << std::endl;
-
 	try {
 		m.at('z');
 	} catch (const std::exception& e) {
-		std::cerr << e.what() << std::endl;
+		std::cout << e.what() << std::endl;
 	}
-	/*const map<char, int> mc(m);
+	const map<char, int> mc(m);
 	try {
 		mc.at('z');
 	} catch (const std::exception& e) {
-		std::cerr << e.what() << std::endl;
-	}*/
+		std::cout << e.what() << std::endl;
+	}
+
+	m['q'] = 42;
+	m['r'] = 55;
+	m['d'] = 25;
+	m['o'] = 10;
+	m['w'] = 90;
+
+	for (map<char, int>::iterator it = m.begin(); it != m.end(); it++)
+		std::cout << it->first << " " << it->second << std::endl;
+	std::cout << std::endl;
+	for (map<char, int>::const_iterator it = mc.begin(); it != mc.end(); it++)
+		std::cout << it->first << " " << it->second << std::endl;
 	return 0;
 }

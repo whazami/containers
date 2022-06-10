@@ -22,7 +22,7 @@ namespace ft
 		
 		// Canonical form
 		map_iterator() : node(NULL) {}
-		map_iterator(const node_ptr& node) : node(node) {}
+		map_iterator(node_ptr node) : node(node) {}
 		map_iterator(const map_iterator &it) {
 			*this = it;
 		}
@@ -30,9 +30,15 @@ namespace ft
 			this->node = it.node;
 			return *this;
 		}
-		template <class U, typename Node2>
-		operator map_iterator<const U, Node2>() const {
-			return map_iterator<const U, Node2>(this->node);
+		template <typename U, typename Node2>
+		operator map_iterator<const U, const Node2>() const {
+			map_iterator<const U, const Node2> ret(this->node);
+			return ret;
+		}
+		template <typename U>
+		operator map_iterator<const U, Node>() const {
+			map_iterator<const U, Node> ret(this->node);
+			return ret;
 		}
 
 		/// OPERATORS
