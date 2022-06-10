@@ -29,6 +29,15 @@ int main()
 	} catch (const std::exception& e) {
 		std::cout << e.what() << std::endl;
 	}
+	map<char, int>::const_iterator cit = mc.find('c');
+	std::cout << cit->first << " " << cit->second << std::endl;
+	cit = mc.lower_bound('e');
+	std::cout << cit->first << " " << cit->second << std::endl;
+	pair<map<char, int>::const_iterator, map<char, int>::const_iterator> pc;
+	pc = mc.equal_range('d');
+	std::cout << "equal range: ";
+	std::cout << pc.first->first << " " << pc.first->second << ", ";
+	std::cout << pc.second->first << " " << pc.second->second << std::endl;
 
 	m['q'] = 42;
 	m['r'] = 55;

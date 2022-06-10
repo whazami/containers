@@ -25,7 +25,6 @@ namespace ft
 		typedef				T												mapped_type;
 		typedef typename	ft::pair<const key_type, mapped_type>			value_type;
 		typedef				Compare											key_compare;
-		//typedef 															value_compare;
 		typedef				Alloc											allocator_type;
 		typedef typename	allocator_type::reference						reference;
 		typedef typename	allocator_type::const_reference					const_reference;
@@ -37,6 +36,20 @@ namespace ft
 		typedef typename	ft::reverse_iterator<const_iterator>			const_reverse_iterator;*/
 		typedef typename	ft::iterator_traits<iterator>::difference_type	difference_type;
 		typedef				size_t											size_type;
+		
+		class value_compare : std::binary_function<value_type, value_type, bool> {
+			friend class map;
+		protected:
+			Compare comp;
+			value_compare (Compare c) : comp(c) {}
+		public:
+			typedef bool		result_type;
+			typedef value_type	first_argument_type;
+			typedef value_type	second_argument_type;
+			bool operator() (const value_type& x, const value_type& y) const {
+				return this->comp(x.first, y.first);
+			}
+		};
 
 		// Constructors & Destructor
 		explicit map(const key_compare& comp = key_compare(),
@@ -144,6 +157,114 @@ namespace ft
 			}
 			p = this->bt.insert(val);
 			return iterator(p);
+		}
+		template <class InputIterator>
+		void insert(InputIterator first, InputIterator last) {
+			for (InputIterator it = first; it != last; it++)
+				this->bt.insert(*it);
+		}
+
+		void erase(iterator position) {
+			this->bt.erase(position->first);
+		}
+		size_type erase(const key_type& k) {
+			if (this->bt.erase(k))
+				return 1;
+			return 0;
+		}
+		void erase(iterator first, iterator last) {
+			for (iterator it = first; it != last; it++)
+				this->bt.erase(it->first);
+		}
+
+		void swap(map& x) {
+			bt_type tmp = this->bt;
+			this->bt = x.bt;
+			x.bt = tmp;
+		}
+
+		void clear() {
+			this->bt.clear();
+		}
+
+		// Observers
+		key_compare key_comp() const {
+			return this->bt.get_map_traits().first;
+		}
+
+		value_compare value_comp() const {
+			value_compare val_comp(this->key_comp());
+			return val_comp;
+		}
+
+		// Operations
+		iterator find(const key_type& k) {
+			node_type *p = this->bt.find(k);
+			return iterator(p);
+		}
+		const_iterator find(const key_type& k) const {
+			node_type *p = this->bt.find(k);
+			return const_iterator(p);
+		}
+
+		size_type count(const key_type& k) const {
+			if (this->bt.find(k))
+				return 1;
+			return 0;
+		}
+
+		iterator lower_bound(const key_type& k) {
+			key_compare comp = this->key_comp();
+			for (iterator it = this->begin(); it != this->end(); it++)
+				if (!comp(it->first, k))
+					return it;
+			return this->end();
+		}
+		const_iterator lower_bound(const key_type& k) const {
+			key_compare comp = this->key_comp();
+			for (const_iterator it = this->begin(); it != this->end(); it++)
+				if (!comp(it->first, k))
+					return it;
+			return this->end();
+		}
+
+		iterator upper_bound(const key_type& k) {
+			key_compare comp = this->key_comp();
+			for (iterator it = this->begin(); it != this->end(); it++)
+				if (comp(k, it->first))
+					return it;
+			return this->end();
+		}
+		const_iterator upper_bound(const key_type& k) const {
+			key_compare comp = this->key_comp();
+			for (const_iterator it = this->begin(); it != this->end(); it++)
+				if (comp(k, it->first))
+					return it;
+			return this->end();
+		}
+
+		ft::pair<const_iterator, const_iterator> equal_range(const key_type& k) const {
+			node_type *p = this->bt.find(k);
+			if (!p)
+				return ft::make_pair(this->end(), this->end());
+			const_iterator begin(p);
+			const_iterator end(p);
+			end++;
+			return ft::make_pair(begin, end);
+		}
+		ft::pair<iterator, iterator> equal_range(const key_type& k) {
+			node_type *p = this->bt.find(k);
+			if (!p)
+				return ft::make_pair(this->end(), this->end());
+			iterator begin(p);
+			iterator end(p);
+			end++;
+			return ft::make_pair(begin, end);
+		}
+
+		// Allocator
+		allocator_type get_allocator() const {
+			return this->bt.get_map_traits().second;
 		}
 
 	private:

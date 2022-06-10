@@ -330,6 +330,14 @@ namespace ft
 			return this->sizee;
 		}
 
+		void clear() {
+			this->deleteRoot();
+		}
+
+		map_traits_type get_map_traits() const {
+			return this->map_traits;
+		}
+
 	private:
 		node_type*		root;
 		node_type		endd;
@@ -348,6 +356,7 @@ namespace ft
 			if (this->root)
 				this->map_traits.second.destroy(this->root);
 			this->map_traits.second.deallocate(this->root, 1);
+			this->sizee = 0;
 		}
 	};
 }
