@@ -12,7 +12,9 @@ OBJS_R		= ${SRCS:%.cpp=${OBJS_D_R}%.o}
 
 HEADERS		= containers/vector.hpp \
 			  containers/map.hpp \
-			  iterators/vector_iterator.hpp
+			  iterators/vector_iterator.hpp \
+			  iterators/map_iterator.hpp \
+			  utils/AVL.hpp
 
 CXX			= c++ -g3 -fsanitize=address
 CXXFLAGS	= -Wall -Wextra -Werror -std=c++98 -pedantic
