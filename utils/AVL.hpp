@@ -12,12 +12,12 @@ namespace ft
 	{
 		template <class T, class Compare>
 		struct Node {
-			Node(Compare comp, T pair, bool end = false) 
+			Node(Compare comp, T pair, Node *endd) 
 			: pair(pair), left(NULL), right(NULL), parent(NULL),
-				height(1), comp(comp), end(end) {}
+				height(1), comp(comp), endd(endd) {}
 			Node(const Node& other) 
 			: pair(other.pair), left(NULL), right(NULL), parent(NULL),
-				height(1), comp(other.comp), end(false) {
+				height(1), comp(other.comp), endd(other.endd) {
 				*this = other;
 			}
 			Node& operator=(const Node& other) {
@@ -26,6 +26,7 @@ namespace ft
 				this->parent = NULL;
 				this->height = other.height;
 				this->comp = other.comp;
+				this->endd = other.endd;
 				return *this;
 			}
 			~Node() {}
@@ -41,6 +42,8 @@ namespace ft
 					while (p && this->comp(p->pair.first, this->pair.first))
 						p = p->parent;
 				}
+				if (!p)
+					return endd;
 				return p;
 			}
 	
@@ -51,7 +54,7 @@ namespace ft
 			int			height;
 		private:
 			Compare		comp;
-			const bool	end;
+			Node*		endd;
 		};
 	
 		template <class T, class Compare>
@@ -83,10 +86,10 @@ namespace ft
 
 		// Constructor & Destructor
 		AVL(const key_compare& comp, const allocator_type& alloc)
-		: root(NULL), endd(comp, value_type(), true), end_ptr(&endd),
+		: root(NULL), endd(comp, value_type(), NULL), end_ptr(&endd),
 			sizee(0), comp(comp), alloc(alloc) {}
 		AVL(const AVL& other)
-		: root(NULL), endd(comp, value_type(), true), end_ptr(&endd),
+		: root(NULL), endd(comp, value_type(), NULL), end_ptr(&endd),
 			sizee(0), comp(other.comp) {
 			*this = other;
 		}
@@ -111,6 +114,16 @@ namespace ft
 		bool insert(value_type pair) {
 			bool exists = (this->find(pair.first) != NULL);
 			this->root = this->insertNode(this->root, pair);
+			if (!exists) {
+				if (this->sizee == 0) {
+					this->endd.right = this->root;
+					this->endd.left = this->root;
+				} else if (this->endd.right->right) {
+					this->endd.left = this->endd.right->right;
+					this->endd.right = this->endd.right->right;
+				}
+				this->sizee++;
+			}
 			return !exists;
 		}
 
@@ -130,6 +143,10 @@ namespace ft
 			return p;
 		}
 
+		node_type *end() const {
+			return this->end_ptr;
+		}
+
 		void print() {
 			this->print("", this->root, true);
 			std::cout << std::endl;
@@ -142,7 +159,7 @@ namespace ft
 	private:
 		node_type		*root;
 		node_type		endd;
-		const node_type	*end_ptr; // Only for const end(), is equal to &endd
+		node_type		*end_ptr; // Only for const end(), is equal to &endd
 		size_type		sizee;
 
 		// Map traits
@@ -157,7 +174,7 @@ namespace ft
 		}
 		node_type* createNode(const value_type& pair) {
 			node_type *ret = this->alloc.allocate(1);
-			this->alloc.construct(ret, node_type(this->comp, pair));
+			this->alloc.construct(ret, node_type(this->comp, pair, &this->endd));
 			return ret;
 		}
 		void deleteNode(node_type *node) {

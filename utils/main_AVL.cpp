@@ -8,13 +8,13 @@ bool insert(T *avl, int key) {
 }
 
 template <typename T>
-void printAvlInOrder(T* root) {
+void printAvlInOrder(T* root, T* end) {
 	T* p = root;
 	if (!root)
 		return;
 	while (p->left)
 		p = p->left;
-	for(;p; p = p->next())
+	for(;p != end; p = p->next())
 		std::cout << p->pair.first << " " << p->pair.second << (p->next() ? ", " : "");
 	std::cout << std::endl;
 }
@@ -39,44 +39,44 @@ int main()
 	std::cout << "should be true: " << insert(&avl, 11) << std::endl;
 	std::cout << "should be false: " << avl.insert(ft::make_pair(44, 'z')) << std::endl;
 	avl.print();
-	printAvlInOrder(avl.getRoot());
+	printAvlInOrder(avl.getRoot(), avl.end());
 	avl.erase(19);
 	std::cout << "After deleting 19: " << std::endl;
 	avl.print();
-	printAvlInOrder(avl.getRoot());
+	printAvlInOrder(avl.getRoot(), avl.end());
 	avl.erase(44);
 	std::cout << "After deleting 44: " << std::endl;
 	avl.print();
-	printAvlInOrder(avl.getRoot());
+	printAvlInOrder(avl.getRoot(), avl.end());
 	avl.erase(11);
 	std::cout << "After deleting 11: " << std::endl;
 	avl.print();
-	printAvlInOrder(avl.getRoot());
+	printAvlInOrder(avl.getRoot(), avl.end());
 	avl.erase(33);
 	std::cout << "After deleting 33: " << std::endl;
 	avl.print();
-	printAvlInOrder(avl.getRoot());
+	printAvlInOrder(avl.getRoot(), avl.end());
 	avl.erase(13);
 	std::cout << "After deleting 13: " << std::endl;
 	avl.print();
-	printAvlInOrder(avl.getRoot());
+	printAvlInOrder(avl.getRoot(), avl.end());
 	avl.erase(61);
 	std::cout << "After deleting 61: " << std::endl;
 	avl.print();
-	printAvlInOrder(avl.getRoot());
+	printAvlInOrder(avl.getRoot(), avl.end());
 	avl.erase(21);
 	std::cout << "After deleting 21: " << std::endl;
 	avl.print();
-	printAvlInOrder(avl.getRoot());
+	printAvlInOrder(avl.getRoot(), avl.end());
 	avl.erase(8);
 	std::cout << "After deleting 8: " << std::endl;
 	avl.print();
-	printAvlInOrder(avl.getRoot());
+	printAvlInOrder(avl.getRoot(), avl.end());
 	std::cout << "should be true: " << avl.erase(53) << std::endl;
 	std::cout << "should be false: " << avl.erase(53) << std::endl;
 	std::cout << "After deleting 53: " << std::endl;
 	avl.print();
-	printAvlInOrder(avl.getRoot());
+	printAvlInOrder(avl.getRoot(), avl.end());
 
 	return 0;
 }
