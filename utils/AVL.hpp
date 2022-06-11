@@ -39,15 +39,15 @@ namespace ft
 			const bool	end;
 		};
 	
-		template <class T>
-		int height(Node<T> *node) {
+		template <class T, class Compare>
+		int height(Node<T, Compare> *node) {
 		if (node == NULL)
 			return 0;
 		return node->height;
 		}
 
-		template <class T>
-		int getBalanceFactor(Node<T> *node) {
+		template <class T, class Compare>
+		int getBalanceFactor(Node<T, Compare> *node) {
 			if (node == NULL)
 				return 0;
 			return height(node->left) - height(node->right);
@@ -60,17 +60,19 @@ namespace ft
 	public:
 		typedef				Key											key_type;
 		typedef				T											mapped_type;
-		typedef typename	ft::pair<const key_type, mapped_type>		value_type;
-		typedef				Node<value_type>							node_type;
+		typedef typename	ft::pair<key_type, mapped_type>		value_type;
 		typedef 			Compare										key_compare;
+		typedef				Node<value_type, key_compare>				node_type;
 		typedef typename	Alloc::template rebind<node_type>::other	allocator_type;
 		typedef				size_t										size_type;
 
 		// Constructor & Destructor
 		AVL(const key_compare& comp, const allocator_type& alloc)
-		: root(NULL), end_ptr(&endd), sizee(0), comp(comp), alloc(alloc) {}
+		: root(NULL), endd(comp, value_type(), true), end_ptr(&endd),
+			sizee(0), comp(comp), alloc(alloc) {}
 		AVL(const AVL& other)
-		: root(NULL), end_ptr(&endd), sizee(0), comp(other.comp) {
+		: root(NULL), endd(comp, value_type(), true), end_ptr(&endd),
+			sizee(0), comp(other.comp) {
 			*this = other;
 		}
 		AVL& operator=(const AVL& other) {
@@ -91,20 +93,17 @@ namespace ft
 		}
 
 		// Methods
-		void print(std::string indent = "", bool last = true) {
-  			if (this->root != NULL) {
-    			std::cout << indent;
-    			if (last) {
-					std::cout << "R----";
-					indent += "   ";
-				} else {
-					std::cout << "L----";
-					indent += "|  ";
-				}
-				std::cout << this->root->key << endl;
-				printTree(this->root->left, indent, false);
-				printTree(this->root->right, indent, true);
-			}
+		void insert(value_type pair) {
+			this->root = this->insertNode(this->root, pair);
+		}
+
+		void erase(key_type key) {
+			this->root = this->deleteNode(this->root, key);
+		}
+
+		void print() {
+			this->print(this->root, "", true);
+			std::cout << std::endl;
 		}
 
 	private:
@@ -125,7 +124,7 @@ namespace ft
 		}
 		node_type* createNode(const value_type& pair) {
 			node_type *ret = this->alloc.allocate(1);
-			this->alloc.construct(ret, node_type(this->comp, pair);
+			this->alloc.construct(ret, node_type(this->comp, pair));
 			return ret;
 		}
 		void deleteNode(node_type *node) {
@@ -149,6 +148,21 @@ namespace ft
 			if (other->right) {
 				node->right = this->createNode(other->right->pair);
 				node->right = this->copyDescendants(node->right, other->right);
+			}
+		}
+		void print(node_type *node, std::string indent, bool last) {
+  			if (node != NULL) {
+    			std::cout << indent;
+    			if (last) {
+					std::cout << "R----";
+					indent += "   ";
+				} else {
+					std::cout << "L----";
+					indent += "|  ";
+				}
+				std::cout << node->pair.first << std::endl;
+				this->print(node->left, indent, false);
+				this->print(node->right, indent, true);
 			}
 		}
 
@@ -191,9 +205,9 @@ namespace ft
 			// Delete
 			if (root == NULL)
 				return root;
-			if (key < root->key)
+			if (key < root->pair.first)
 				root->left = deleteNode(root->left, key);
-			else if (key > root->key)
+			else if (key > root->pair.first)
 				root->right = deleteNode(root->right, key);
 			else {
 				if ((root->left == NULL) || (root->right == NULL)) {
@@ -208,9 +222,9 @@ namespace ft
 					node_type *temp = root->right;
 					while (temp->left)
 						temp = temp->left;
-					root->key = temp->key;
+					root->pair.first = temp->pair.first;
 					root->right = deleteNode(root->right,
-					temp->key);
+					temp->pair.first);
 				}
 			}
 			if (root == NULL)
@@ -239,9 +253,9 @@ namespace ft
 			return root;
 		}
 		// Rotations
-		Node *rightRotate(Node *y) {
-			Node *x = y->left;
-			Node *T2 = x->right;
+		node_type *rightRotate(node_type *y) {
+			node_type *x = y->left;
+			node_type *T2 = x->right;
 
 			x->right = y;
 			y->left = T2;
@@ -251,9 +265,9 @@ namespace ft
 								height(x->right)) + 1;
 			return x;
 		}
-		Node *leftRotate(Node *x) {
-			Node *y = x->right;
-			Node *T2 = y->left;
+		node_type *leftRotate(node_type *x) {
+			node_type *y = x->right;
+			node_type *T2 = y->left;
 
 			y->left = x;
 			x->right = T2;
@@ -265,26 +279,6 @@ namespace ft
 		}
 		/// /////////////////// ///
 	};
-}
-
-int main() {
-	ft::AVL avl;
-
-	Node *root = NULL;
-	root = insertNode(root, 33);
-	root = insertNode(root, 13);
-	root = insertNode(root, 53);
-	root = insertNode(root, 9);
-	root = insertNode(root, 21);
-	root = insertNode(root, 61);
-	root = insertNode(root, 8);
-	root = insertNode(root, 11);
-	//printTree(root, "", true);
-	avl.print();
-	root = deleteNode(root, 13);
-	cout << "After deleting " << endl;
-	//printTree(root, "", true);
-	avl.print();
 }
 
 #endif // AVL_HPP
