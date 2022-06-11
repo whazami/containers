@@ -65,6 +65,9 @@ namespace ft
 		value_type *operator->() {
 			return &(**this->node);
 		}
+		value_type *operator->() const {
+			return &(**this->node);
+		}
 		value_type &operator*() { // Dereferencing as an lvalue
 			return **this->node;
 		}

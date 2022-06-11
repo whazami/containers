@@ -72,5 +72,12 @@ int main()
 
 	std::cout << "m size: " << m.size() << std::endl;
 	std::cout << "mc size: " << mc.size() << std::endl;
+
+	std::cout << "Template tests" << std::endl;
+	map<char, int> mt(m.begin(), m.end());
+	mt.insert(mt.begin(), mt.end());
+	for (map<char, int>::iterator it = mt.begin(); it != mt.end(); it++)
+		std::cout << it->first << " " << it->second << ", ";
+	std::cout << std::endl;
 	return 0;
 }

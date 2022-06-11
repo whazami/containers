@@ -62,7 +62,8 @@ namespace ft
 			const allocator_type& alloc = allocator_type())
 		: bt(ft::make_pair(comp, alloc)) {
 			for (InputIterator it = first; it != last; it++)
-				bt.insert(*it);
+				if (!this->bt.find(it->first))
+					bt.insert(*it);
 		}
 
 		map(const map& x) : bt(x.bt) {
@@ -100,7 +101,7 @@ namespace ft
 			return this->bt.size();
 		}
 		size_type max_size() const {
-			return this->alloc.max_size();
+			return this->get_allocator().max_size();
 		}
 
 		// Element access
@@ -161,7 +162,8 @@ namespace ft
 		template <class InputIterator>
 		void insert(InputIterator first, InputIterator last) {
 			for (InputIterator it = first; it != last; it++)
-				this->bt.insert(*it);
+				if (!this->bt.find(it->first))
+					this->bt.insert(*it);
 		}
 
 		void erase(iterator position) {

@@ -45,6 +45,14 @@ namespace ft
 				parent(other.parent), end(other.end), pair(other.pair),
 				compare(other.compare), alloc(other.alloc) {}
 
+			Node& operator=(const Node& other) {
+				this->left = other.left;
+				this->right = other.right;
+				this->parent = other.parent;
+				this->compare = other.compare;
+				return *this;
+			}
+
 			void copyDescendants(const Node* other) {
 				if (!isLeaf(other->left)) {
 					this->createChild(other->left->pair, true);
@@ -101,7 +109,7 @@ namespace ft
 			Node* add(const value_type& pair) {
 				if (this->pair.first == pair.first) {
 					this->pair.second = pair.second;
-					std::cout << "/!\\ Has entered the forbidden zone /!\\";
+					//std::cout << "/!\\ Has entered the forbidden zone /!\\";
 					return this;
 				}
 				bool left = this->compare(pair.first, this->pair.first);
@@ -120,14 +128,15 @@ namespace ft
 					return NULL;
 				if ((ret = this->relinkToChild(p, &this->right)))				// Only right
 					return ret;
-				while (p->right)
+				while (!isLeaf(p->right))
 					p = p->right;
 				if ((ret = this->relinkToChild(p, &this->left, !this->right)))	// Only left
 					return ret;
 				Node *newRoot = p;
 				while (newRoot->parent)
 					newRoot = newRoot->parent;
-				this->pair = p->pair;											// Both
+				this->setPair(p->pair);											// Both
+				//this->pair = p->pair;
 				this->changeParentPOV(p, p->left ? &p->left : NULL);
 				this->deallocate(p);
 				return newRoot;
@@ -178,7 +187,7 @@ namespace ft
 			Node			*left;
 			Node			*right;
 			Node			*parent;
-			bool			end;
+			const bool		end;
 
 			// Data
 			value_type		pair;
@@ -201,24 +210,31 @@ namespace ft
 				this->alloc.deallocate(p, 1);
 			}
 
-			void changeParentPOV(Node *p, Node **newPOV) {
+			void changeParentPOV(Node *p, Node **newPOV) const {
 				if (!p->parent)
 					return ;
 				bool pIsLeftChild = (p == p->parent->left);
 				Node **pFromParentPOV = pIsLeftChild ? &p->parent->left : &p->parent->right;
 				*pFromParentPOV = newPOV ? *newPOV : NULL;
-				if (newPOV)
-					(*newPOV)->parent = p->parent;
+				if (newPOV) {
+					if ((*newPOV)->end)
+						(*newPOV)->left = p->parent;
+					else
+						(*newPOV)->parent = p->parent;
+				}
 				p->left = NULL;
 				p->right = NULL;
 			}
 
 			Node* relinkToChild(Node *p, Node **child, bool additionalCond = true) {
-				if (p == (child ? *child : NULL) && additionalCond) {
+				bool cond = child ? (p == *child) : isLeaf(p);
+				if (cond && additionalCond) {
 					if (p && !p->parent->parent) { // if we're erasing the root and it has one and only one child
 						*child = NULL;
 						this->deallocate(p->parent);
 						p->parent = NULL;
+						Node *end = p->parent->left;
+
 					} else {
 						this->changeParentPOV(this, child);
 						this->deallocate(this);
@@ -232,8 +248,13 @@ namespace ft
 				return NULL;
 			}
 
-			// Should never be used
-			Node& operator=(const Node& other);
+			void setPair(const value_type& pair) {
+				Node *childs[2] = { this->left, this->right };
+				*this = Node(this->parent,
+						ft::make_pair(this->compare, this->alloc), pair);
+				this->left = childs[0];
+				this->right = childs[1];
+			}
 		};
 
 		template <class Key, class T, class Compare, class Alloc>
