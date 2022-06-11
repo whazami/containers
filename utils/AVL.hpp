@@ -13,26 +13,41 @@ namespace ft
 		template <class T, class Compare>
 		struct Node {
 			Node(Compare comp, T pair, bool end = false) 
-			: pair(pair), left(NULL), right(NULL), height(1), comp(comp), end(end) {}
+			: pair(pair), left(NULL), right(NULL), parent(NULL),
+				height(1), comp(comp), end(end) {}
 			Node(const Node& other) 
-			: pair(other.pair), left(NULL), right(NULL), height(1),
-				comp(other.comp), end(false) {
+			: pair(other.pair), left(NULL), right(NULL), parent(NULL),
+				height(1), comp(other.comp), end(false) {
 				*this = other;
 			}
 			Node& operator=(const Node& other) {
-				//this->setPair(other.pair);
-				this->pair = other.pair;
 				this->left = other.left;
 				this->right = other.right;
+				this->parent = NULL;
 				this->height = other.height;
 				this->comp = other.comp;
 				return *this;
 			}
 			~Node() {}
+
+			Node* next() {
+				Node *p;
+				if (this->right) {
+					p = this->right;
+					while (p->left)
+						p = p->left;
+				} else {
+					p = this->parent;
+					while (p && this->comp(p->pair.first, this->pair.first))
+						p = p->parent;
+				}
+				return p;
+			}
 	
 			T			pair;
 			Node		*left;
 			Node		*right;
+			Node		*parent;
 			int			height;
 		private:
 			Compare		comp;
@@ -60,7 +75,7 @@ namespace ft
 	public:
 		typedef				Key											key_type;
 		typedef				T											mapped_type;
-		typedef typename	ft::pair<key_type, mapped_type>		value_type;
+		typedef typename	ft::pair<const key_type, mapped_type>		value_type;
 		typedef 			Compare										key_compare;
 		typedef				Node<value_type, key_compare>				node_type;
 		typedef typename	Alloc::template rebind<node_type>::other	allocator_type;
@@ -93,17 +108,35 @@ namespace ft
 		}
 
 		// Methods
-		void insert(value_type pair) {
+		bool insert(value_type pair) {
+			bool exists = (this->find(pair.first) != NULL);
 			this->root = this->insertNode(this->root, pair);
+			return !exists;
 		}
 
-		void erase(key_type key) {
+		bool erase(key_type key) {
+			if (!this->find(key))
+				return false;
 			this->root = this->deleteNode(this->root, key);
+			this->sizee--;
+			return true;
+		}
+
+		node_type *find(key_type key) {
+			node_type *p = this->root;
+			while (p && (this->comp(key, p->pair.first)
+							|| this->comp(p->pair.first, key)))
+				p = this->comp(key, p->pair.first) ? p->left : p->right;
+			return p;
 		}
 
 		void print() {
-			this->print(this->root, "", true);
+			this->print("", this->root, true);
 			std::cout << std::endl;
+		}
+
+		node_type *getRoot() {
+			return this->root;
 		}
 
 	private:
@@ -143,26 +176,43 @@ namespace ft
 		node_type* copyDescendants(node_type* node, const node_type* other) {
 			if (other->left) {
 				node->left = this->createNode(other->left->pair);
+				node->left->parent = node;
 				node->left = this->copyDescendants(node->left, other->left);
 			}
 			if (other->right) {
 				node->right = this->createNode(other->right->pair);
+				node->right->parent = node;
 				node->right = this->copyDescendants(node->right, other->right);
 			}
 		}
-		void print(node_type *node, std::string indent, bool last) {
-  			if (node != NULL) {
-    			std::cout << indent;
-    			if (last) {
-					std::cout << "R----";
-					indent += "   ";
-				} else {
-					std::cout << "L----";
-					indent += "|  ";
-				}
+		node_type *setPair(node_type *node, value_type pair) {
+			const node_type* node_addr = node;
+			node_type tmp = *node;
+			tmp.parent = node->parent;
+			this->deleteNode(node);
+			node_type *ret = this->createNode(pair);
+			*ret = tmp;
+			ret->parent = tmp.parent;
+			if (ret->left)
+				ret->left->parent = ret;
+			if (ret->right)
+				ret->right->parent = ret;
+			if (ret->parent) {
+				bool isLeftChild = (ret->parent->left == node_addr);
+				if (isLeftChild)
+					ret->parent->left = ret;
+				else
+					ret->parent->right = ret;
+			}
+			return ret;
+		}
+		void print(const std::string& prefix, const node_type* node, bool isLeft) {
+			if (node) {
+				std::cout << prefix;
+				std::cout << (!isLeft ? "├──" : "└──");
 				std::cout << node->pair.first << std::endl;
-				this->print(node->left, indent, false);
-				this->print(node->right, indent, true);
+				this->print(prefix + (!isLeft ? "│   " : "    "), node->right, false);
+				this->print(prefix + (!isLeft ? "│   " : "    "), node->left, true);
 			}
 		}
 
@@ -172,29 +222,35 @@ namespace ft
 			// Insert
 			if (node == NULL)
 				return (this->createNode(pair));
-			if (pair.first < node->pair.first)
+			if (this->comp(pair.first, node->pair.first)) {
 				node->left = insertNode(node->left, pair);
-			else if (pair.first > node->pair.first)
+				node->left->parent = node;
+			}
+			else if (this->comp(node->pair.first, pair.first)) {
 				node->right = insertNode(node->right, pair);
-			else
+				node->right->parent = node;
+			}
+			else {
+				node->pair.second = pair.second;
 				return node;
+			}
 
 			// Update balance factors and balance the tree
 			node->height = 1 + std::max(height(node->left),
 										height(node->right));
 			int balanceFactor = getBalanceFactor(node);
 			if (balanceFactor > 1) {
-				if (pair.first < node->left->pair.first)
+				if (this->comp(pair.first, node->left->pair.first))
 					return rightRotate(node);
-				else if (pair.first > node->left->pair.first) {
+				else if (this->comp(node->left->pair.first, pair.first)) {
 					node->left = leftRotate(node->left);
 					return rightRotate(node);
 				}
 			}
 			if (balanceFactor < -1) {
-				if (pair.first > node->right->pair.first)
+				if (this->comp(node->right->pair.first, pair.first))
 					return leftRotate(node);
-				else if (pair.first < node->right->pair.first) {
+				else if (this->comp(pair.first, node->right->pair.first)) {
 					node->right = rightRotate(node->right);
 					return leftRotate(node);
 				}
@@ -205,9 +261,9 @@ namespace ft
 			// Delete
 			if (root == NULL)
 				return root;
-			if (key < root->pair.first)
+			if (this->comp(key, root->pair.first))
 				root->left = deleteNode(root->left, key);
-			else if (key > root->pair.first)
+			else if (this->comp(root->pair.first, key))
 				root->right = deleteNode(root->right, key);
 			else {
 				if ((root->left == NULL) || (root->right == NULL)) {
@@ -215,21 +271,23 @@ namespace ft
 					if (temp == NULL) {
 						temp = root;
 						root = NULL;
-					} else
+					} else {
 						*root = *temp;
+						root = this->setPair(root, temp->pair);
+						root->parent = temp->parent ? temp->parent->parent : NULL;
+					}
 					this->deleteNode(temp);
 				} else {
 					node_type *temp = root->right;
 					while (temp->left)
 						temp = temp->left;
-					root->pair.first = temp->pair.first;
+					root = this->setPair(root, temp->pair);
 					root->right = deleteNode(root->right,
 					temp->pair.first);
 				}
 			}
 			if (root == NULL)
 				return root;
-
 			// Update balance factors and balance the tree
 			root->height = 1 + std::max(height(root->left),
 										height(root->right));
@@ -263,6 +321,10 @@ namespace ft
 								height(y->right)) + 1;
 			x->height = std::max(height(x->left),
 								height(x->right)) + 1;
+			x->parent = y->parent;
+			y->parent = x;
+			if (y->left)
+				y->left->parent = y;
 			return x;
 		}
 		node_type *leftRotate(node_type *x) {
@@ -275,6 +337,10 @@ namespace ft
 								height(x->right)) + 1;
 			y->height = std::max(height(y->left),
 								height(y->right)) + 1;
+			y->parent = x->parent;
+			x->parent = y;
+			if (x->right)
+				x->right->parent = x;
 			return y;
 		}
 		/// /////////////////// ///
