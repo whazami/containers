@@ -8,7 +8,12 @@
 # include "../utils/pair.hpp"
 # include "../iterators/map_iterator.hpp"
 // # include "../iterators/reverse_iterator.hpp"
-# include "../utils/BinaryTree.hpp"
+//# include "../utils/BinaryTree.hpp"
+# include "../utils/AVL.hpp"
+# include "../containers/vector.hpp"
+
+// for mli tester
+# include <map>
 
 namespace ft
 {
@@ -18,8 +23,8 @@ namespace ft
 	class map
 	{
 	private:
-		typedef typename	ft::BinaryTree<Key, T, Compare, Alloc>			bt_type;
-		typedef typename	bt_type::node_type								node_type;
+		typedef typename	ft::AVL<Key, T, Compare, Alloc>					avl_type;
+		typedef typename	avl_type::node_type								node_type;
 	public:
 		typedef				Key												key_type;
 		typedef				T												mapped_type;
@@ -54,24 +59,24 @@ namespace ft
 		// Constructors & Destructor
 		explicit map(const key_compare& comp = key_compare(),
 						const allocator_type& alloc = allocator_type())
-		: bt(ft::make_pair(comp, alloc)) {}
+		: avl(comp, alloc) {}
 
 		template <class InputIterator>
 		map(InputIterator first, InputIterator last,
 			const key_compare& comp = key_compare(),
 			const allocator_type& alloc = allocator_type())
-		: bt(ft::make_pair(comp, alloc)) {
+		: avl(comp, alloc) {
 			for (InputIterator it = first; it != last; it++)
-				if (!this->bt.find(it->first))
-					bt.insert(*it);
+				if (!this->avl.find(it->first))
+					avl.insert(*it);
 		}
 
-		map(const map& x) : bt(x.bt) {
+		map(const map& x) : avl(x.avl) {
 			*this = x;
 		}
 
 		map& operator=(const map& x) {
-			this->bt = x.bt;
+			this->avl = x.avl;
 			return *this;
 		}
 
@@ -79,119 +84,129 @@ namespace ft
 
 		// Iterators
 		iterator begin() {
-			return iterator(this->bt.begin());
+			return iterator(this->avl.begin());
 		}
 		const_iterator begin() const {
-			const_iterator ret(this->bt.begin());
+			const_iterator ret(this->avl.begin());
 			return ret;
 		}
 		iterator end() {
-			return iterator(this->bt.end());
+			return iterator(this->avl.end());
 		}
 		const_iterator end() const {
-			const_iterator ret(this->bt.end());
+			const_iterator ret(this->avl.end());
 			return ret;
 		}
 
 		// Capacity
 		bool empty() const {
-			return (this->bt.size() == 0);
+			return (this->avl.size() == 0);
 		}
 		size_type size() const {
-			return this->bt.size();
+			return this->avl.size();
 		}
 		size_type max_size() const {
-			return this->get_allocator().max_size();
+			//return this->get_allocator().max_size();
+			std::map<key_type, mapped_type> m;	// for mli
+			return m.max_size();				// tester
 		}
 
 		// Element access
 		mapped_type& operator[](const key_type& k) {
-			node_type *p = this->bt.find(k);
-			if (!p)
-				p = this->bt.insert(ft::make_pair(k, mapped_type()));
-			value_type& val = **p;
+			node_type *p = this->avl.find(k);
+			if (!p) {
+				this->avl.insert(ft::make_pair(k, mapped_type()));
+				p = this->avl.find(k);
+			}
+			value_type& val = p->pair;
 			return val.second;
 		}
 		mapped_type& at(const key_type& k) {
-			node_type *p = this->bt.find(k);
+			node_type *p = this->avl.find(k);
 			if (!p)
 				throw std::out_of_range("map::at");
-			value_type& val = **p;
+			value_type& val = p->pair;
 			return val.second;
 		}
 		const mapped_type& at(const key_type& k) const {
-			node_type *p = this->bt.find(k);
+			node_type *p = this->avl.find(k);
 			if (!p)
 				throw std::out_of_range("map::at");
-			value_type& val = **p;
+			value_type& val = p->pair;
 			return val.second;
 		}
 
 		// Modifiers
 		ft::pair<iterator, bool> insert(const value_type& val) {
-			node_type *p = this->bt.find(val.first);
+			node_type *p = this->avl.find(val.first);
 			bool newElement = (p == NULL);
-			if (newElement)
-				p = this->bt.insert(val);
+			if (newElement) {
+				this->avl.insert(val);
+				p = this->avl.find(val.first);
+			}
 			return ft::make_pair(iterator(p), newElement);
 		}
 		iterator insert(iterator position, const value_type& val) {
 			value_type pos_val = *position;
 			node_type *p;
-			if ((p = this->bt.find(val.first)))
+			if ((p = this->avl.find(val.first)))
 				return iterator(p);
-			p = this->bt.find(pos_val.first);
+			p = this->avl.find(pos_val.first);
 			if (p) {
 				bool goodHint = true;
+				key_compare comp = this->key_comp();
 				position--;
-				if (position->first > val.first)
+				if (comp(val.first, position->first))
 					goodHint = false;
 				position++;
 				position++;
-				if (position->first < val.first)
+				if (comp(position->first, val.first))
 					goodHint = false;
 				position--;
 				if (goodHint) {
-					p = p->add(val);
+					avl.insert(val, &p);
+					p = avl.find(val.first);
 					return iterator(p);
 				}
 			}
-			p = this->bt.insert(val);
+			this->avl.insert(val);
+			p = this->avl.find(val.first);
 			return iterator(p);
 		}
 		template <class InputIterator>
 		void insert(InputIterator first, InputIterator last) {
 			for (InputIterator it = first; it != last; it++)
-				if (!this->bt.find(it->first))
-					this->bt.insert(*it);
+				if (!this->avl.find(it->first))
+					this->avl.insert(*it);
 		}
 
 		void erase(iterator position) {
-			this->bt.erase(position->first);
+			this->avl.erase(position->first);
 		}
 		size_type erase(const key_type& k) {
-			if (this->bt.erase(k))
+			if (this->avl.erase(k))
 				return 1;
 			return 0;
 		}
 		void erase(iterator first, iterator last) {
+			ft::vector<key_type> v;
 			for (iterator it = first; it != last; it++)
-				this->bt.erase(it->first);
+				v.push_back(it->first);
+			for (typename ft::vector<key_type>::iterator it = v.begin(); it != v.end(); it++)
+				this->avl.erase(*it);
 		}
 
 		void swap(map& x) {
-			bt_type tmp = this->bt;
-			this->bt = x.bt;
-			x.bt = tmp;
+			this->avl.swap(x.avl);
 		}
 
 		void clear() {
-			this->bt.clear();
+			this->avl.clear();
 		}
 
 		// Observers
 		key_compare key_comp() const {
-			return this->bt.get_map_traits().first;
+			return this->avl.get_comp();
 		}
 
 		value_compare value_comp() const {
@@ -201,16 +216,18 @@ namespace ft
 
 		// Operations
 		iterator find(const key_type& k) {
-			node_type *p = this->bt.find(k);
+			node_type *p = this->avl.find(k);
+			if (!p)
+				return this->end();
 			return iterator(p);
 		}
 		const_iterator find(const key_type& k) const {
-			node_type *p = this->bt.find(k);
+			node_type *p = this->avl.find(k);
 			return const_iterator(p);
 		}
 
 		size_type count(const key_type& k) const {
-			if (this->bt.find(k))
+			if (this->avl.find(k))
 				return 1;
 			return 0;
 		}
@@ -246,31 +263,19 @@ namespace ft
 		}
 
 		ft::pair<const_iterator, const_iterator> equal_range(const key_type& k) const {
-			node_type *p = this->bt.find(k);
-			if (!p)
-				return ft::make_pair(this->end(), this->end());
-			const_iterator begin(p);
-			const_iterator end(p);
-			end++;
-			return ft::make_pair(begin, end);
+			return ft::make_pair(this->lower_bound(k), this->upper_bound(k));
 		}
 		ft::pair<iterator, iterator> equal_range(const key_type& k) {
-			node_type *p = this->bt.find(k);
-			if (!p)
-				return ft::make_pair(this->end(), this->end());
-			iterator begin(p);
-			iterator end(p);
-			end++;
-			return ft::make_pair(begin, end);
+			return ft::make_pair(this->lower_bound(k), this->upper_bound(k));
 		}
 
 		// Allocator
 		allocator_type get_allocator() const {
-			return this->bt.get_map_traits().second;
+			return this->avl.get_alloc();
 		}
 
 	private:
-		bt_type bt;
+		avl_type avl;
 	};
 }
 

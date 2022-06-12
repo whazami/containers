@@ -3,7 +3,7 @@
 
 # include <iostream>
 # include <iterator>
-# include "../utils/BinaryTree.hpp"
+# include "../utils/AVL.hpp"
 
 namespace ft
 {
@@ -60,16 +60,16 @@ namespace ft
 
 		// Dereferencing
 		value_type operator*() const {
-			return **this->node;
+			return this->node->pair;
 		}
 		value_type *operator->() {
-			return &(**this->node);
+			return &this->node->pair;
 		}
 		value_type *operator->() const {
-			return &(**this->node);
+			return &this->node->pair;
 		}
 		value_type &operator*() { // Dereferencing as an lvalue
-			return **this->node;
+			return this->node->pair;
 		}
 
 		// Increment & Decrement
@@ -83,7 +83,7 @@ namespace ft
 			return tmp;
 		}
 		map_iterator &operator--() { // Pre-decrementation
-			// a faire
+			this->node = this->node->prev();
 			return *this;
 		}
 		map_iterator	operator--(int) { // Post-decrementation

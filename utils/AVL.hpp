@@ -46,6 +46,21 @@ namespace ft
 					return endd;
 				return p;
 			}
+			Node* prev() {
+				Node *p;
+				if (this->left) {
+					p = this->left;
+					while (p->right)
+						p = p->right;
+				} else {
+					p = this->parent;
+					while (p && this->comp(this->pair.first, p->pair.first))
+						p = p->parent;
+				}
+				if (!p)
+					return endd;
+				return p;
+			}
 	
 			T			pair;
 			Node		*left;
@@ -89,21 +104,29 @@ namespace ft
 		: root(NULL), endd(comp, value_type(), NULL), end_ptr(&endd),
 			sizee(0), comp(comp), alloc(alloc) {}
 		AVL(const AVL& other)
-		: root(NULL), endd(comp, value_type(), NULL), end_ptr(&endd),
+		: root(NULL), endd(other.comp, value_type(), NULL), end_ptr(&endd),
 			sizee(0), comp(other.comp) {
 			*this = other;
 		}
 		AVL& operator=(const AVL& other) {
+			this->endd.right = NULL;
+			this->endd.left = NULL;
 			// Copying all nodes (by reallocation)
 			if (other.root) {
 				if (this->root)
 					this->deleteRoot();
 				this->root = this->createNode(other.root->pair);
 				this->root = this->copyDescendants(this->root, other.root);
+				node_type* p = this->root;
+				while (p->right)
+					p = p->right;
+				this->endd.right = p;
+				this->endd.left = p;
 			}
 			// Other attributes
 			this->sizee = other.sizee;
 			this->comp = other.comp;
+			this->end_ptr = &this->endd;
 			return *this;
 		}
 		~AVL() {
@@ -112,12 +135,15 @@ namespace ft
 
 		// Methods
 		bool insert(value_type pair) {
+			return this->insert(pair, &this->root);
+		}
+		bool insert(value_type pair, node_type **node) {
 			bool exists = (this->find(pair.first) != NULL);
-			this->root = this->insertNode(this->root, pair);
+			*node = this->insertNode(*node, pair);
 			if (!exists) {
 				if (this->sizee == 0) {
-					this->endd.right = this->root;
-					this->endd.left = this->root;
+					this->endd.right = *node;
+					this->endd.left = *node;
 				} else if (this->endd.right->right) {
 					this->endd.left = this->endd.right->right;
 					this->endd.right = this->endd.right->right;
@@ -130,12 +156,17 @@ namespace ft
 		bool erase(key_type key) {
 			if (!this->find(key))
 				return false;
+			if (!this->comp(key, this->endd.right->pair.first)
+				&& !this->comp(this->endd.right->pair.first, key)) {
+				this->endd.left = this->endd.right->prev();
+				this->endd.right = this->endd.right->prev();
+			}
 			this->root = this->deleteNode(this->root, key);
 			this->sizee--;
 			return true;
 		}
 
-		node_type *find(key_type key) {
+		node_type *find(key_type key) const {
 			node_type *p = this->root;
 			while (p && (this->comp(key, p->pair.first)
 							|| this->comp(p->pair.first, key)))
@@ -143,8 +174,40 @@ namespace ft
 			return p;
 		}
 
+		node_type *begin() const {
+			if (!this->root)
+				return this->end_ptr;
+			node_type *p = this->root;
+			while (p->left)
+				p = p->left;
+			return p;
+		}
+
 		node_type *end() const {
 			return this->end_ptr;
+		}
+
+		size_type size() const {
+			return this->sizee;
+		}
+
+		void clear() {
+			this->deleteRoot();
+		}
+
+		void swap(AVL& other) {
+			std::swap(this->root, other.root);
+			std::swap(this->endd, other.endd);
+			std::swap(this->end_ptr, other.end_ptr);
+			std::swap(this->sizee, other.sizee);
+			std::swap(this->comp, other.comp);
+		}
+
+		key_compare get_comp() const {
+			return this->comp;
+		}
+		allocator_type get_alloc() const {
+			return this->alloc;
 		}
 
 		void print() {
@@ -170,6 +233,7 @@ namespace ft
 		void deleteRoot() {
 			if (this->root)
 				this->deleteNodeAndItsDescendants(this->root);
+			this->root = NULL;
 			this->sizee = 0;
 		}
 		node_type* createNode(const value_type& pair) {
@@ -201,6 +265,7 @@ namespace ft
 				node->right->parent = node;
 				node->right = this->copyDescendants(node->right, other->right);
 			}
+			return node;
 		}
 		node_type *setPair(node_type *node, value_type pair) {
 			const node_type* node_addr = node;
@@ -220,6 +285,11 @@ namespace ft
 					ret->parent->left = ret;
 				else
 					ret->parent->right = ret;
+			}
+			if (!this->comp(this->endd.right->pair.first, ret->pair.first)
+				&& !this->comp(ret->pair.first, this->endd.right->pair.first)) {
+				this->endd.left = ret;
+				this->endd.right = ret;
 			}
 			return ret;
 		}
@@ -289,9 +359,10 @@ namespace ft
 						temp = root;
 						root = NULL;
 					} else {
+						node_type* save_parent = temp->parent ? temp->parent->parent : NULL;
 						*root = *temp;
 						root = this->setPair(root, temp->pair);
-						root->parent = temp->parent ? temp->parent->parent : NULL;
+						root->parent = save_parent;
 					}
 					this->deleteNode(temp);
 				} else {
