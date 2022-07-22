@@ -2,8 +2,11 @@
 NAME		= ft_containers
 REAL		= real
 
-SRCS_DIR	= mains/map/mine/
-SRCS		= main.cpp
+SRCS_DIR	= mains/mine/
+SRCS		= main_vector.cpp
+#SRCS		= main_map.cpp
+#SRCS		= main_stack.cpp
+#SRCS		= main_rev_it.cpp
 
 OBJS_D		= objs/
 OBJS_D_R	= objs_r/
@@ -16,7 +19,7 @@ HEADERS		= containers/vector.hpp \
 			  iterators/map_iterator.hpp \
 			  utils/AVL.hpp
 
-CXX			= c++ -g3 -fsanitize=address
+CXX			= c++
 CXXFLAGS	= -Wall -Wextra -Werror -std=c++98 -pedantic
 RM			= rm -f
 

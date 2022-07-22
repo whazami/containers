@@ -20,7 +20,7 @@ namespace ft
 		typedef typename iterator::reference			reference;
 		typedef typename iterator::iterator_category	iterator_category;
 		
-		// Canonical form
+		// Constructors
 		map_iterator() : node(NULL) {}
 		map_iterator(node_ptr node) : node(node) {}
 		map_iterator(const map_iterator &it) {
@@ -44,9 +44,7 @@ namespace ft
 		/// OPERATORS
 		// Equality Comparisons
 		bool operator==(const map_iterator& rhs) const {
-			if (this->node == rhs.node)
-				return true;
-			return false;
+			return this->node == rhs.node;
 		}
 		bool operator!=(const map_iterator& rhs) const {
 			return !(*this == rhs);
@@ -68,25 +66,25 @@ namespace ft
 		value_type *operator->() const {
 			return &this->node->pair;
 		}
-		value_type &operator*() { // Dereferencing as an lvalue
+		value_type &operator*() {			// Dereferencing as an lvalue
 			return this->node->pair;
 		}
 
 		// Increment & Decrement
-		map_iterator &operator++() { // Pre-incrementation
+		map_iterator &operator++() {		// Pre-incrementation
 			this->node = this->node->next();
 			return *this;
 		}
-		map_iterator	operator++(int) { // Post-incrementation
+		map_iterator	operator++(int) {	// Post-incrementation
 			map_iterator tmp(*this);
 			this->operator++();
 			return tmp;
 		}
-		map_iterator &operator--() { // Pre-decrementation
+		map_iterator &operator--() {		// Pre-decrementation
 			this->node = this->node->prev();
 			return *this;
 		}
-		map_iterator	operator--(int) { // Post-decrementation
+		map_iterator	operator--(int) {	// Post-decrementation
 			map_iterator tmp(*this);
 			this->operator--();
 			return tmp;
@@ -99,9 +97,7 @@ namespace ft
 	template <class U, typename Node2, class V, typename Node3>
 	bool operator==(const map_iterator<U, Node2>& lhs,
 					const map_iterator<V, Node3>& rhs) {
-		if (lhs.node == rhs.node)
-			return true;
-		return false;
+		return lhs.node == rhs.node;
 	}
 	template <class U, typename Node2, class V, typename Node3>
 	bool operator!=(const map_iterator<U, Node2>& lhs,

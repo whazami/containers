@@ -18,7 +18,7 @@ namespace ft
 		typedef typename iterator::reference			reference;
 		typedef typename iterator::iterator_category	iterator_category;
 		
-		// Canonical form
+		// Constructors
 		vector_iterator() : p(NULL) {}
 		vector_iterator(pointer p) : p(p) {}
 		vector_iterator(const vector_iterator &it) {
@@ -56,25 +56,25 @@ namespace ft
 		value_type *operator->() {
 			return this->p;
 		}
-		value_type &operator*() { // Dereferencing as an lvalue
+		value_type &operator*() {			// Dereferencing as an lvalue
 			return *this->p;
 		}
 
 		// Increment & Decrement
-		vector_iterator &operator++() { // Pre-incrementation
+		vector_iterator &operator++() {		// Pre-incrementation
 			this->p++;
 			return *this;
 		}
-		vector_iterator	operator++(int) { // Post-incrementation
+		vector_iterator	operator++(int) {	// Post-incrementation
 			vector_iterator tmp(*this);
 			this->operator++();
 			return tmp;
 		}
-		vector_iterator &operator--() { // Pre-decrementation
+		vector_iterator &operator--() {		// Pre-decrementation
 			this->p--;
 			return *this;
 		}
-		vector_iterator	operator--(int) { // Post-decrementation
+		vector_iterator	operator--(int) {	// Post-decrementation
 			vector_iterator tmp(*this);
 			this->operator--();
 			return tmp;
@@ -141,7 +141,8 @@ namespace ft
 	private:
 		pointer	p;	
 	};
-	
+
+	// Relational Operators
 	template <class T>
 	vector_iterator<T> operator+(int n, vector_iterator<T> vit) {
 		return vit + n;
@@ -149,9 +150,7 @@ namespace ft
 
 	template <typename T, typename U>
 	bool operator==(const vector_iterator<T>& lhs, const vector_iterator<U>& rhs) {
-		if (lhs.p == rhs.p)
-			return true;
-		return false;
+		return lhs.p == rhs.p;
 	}
 	template <typename T, typename U>
 	bool operator!=(const vector_iterator<T>& lhs, const vector_iterator<U>& rhs) {
@@ -166,13 +165,11 @@ namespace ft
 
 	template <typename T, typename U>
 	bool operator<(const vector_iterator<T>& lhs, const vector_iterator<U>& rhs) {
-		if (lhs.p < rhs.p)
-			return true;
-		return false;
+		return lhs.p < rhs.p;
 	}
 	template <typename T, typename U>
 	bool operator>(const vector_iterator<T>& lhs, const vector_iterator<U>& rhs) {
-		return (rhs < lhs);
+		return rhs < lhs;
 	}
 	template <typename T, typename U>
 	bool operator<=(const vector_iterator<T>& lhs, const vector_iterator<U>& rhs) {

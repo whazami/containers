@@ -7,13 +7,12 @@
 # include "../utils/iterator_traits.hpp"
 # include "../utils/pair.hpp"
 # include "../iterators/map_iterator.hpp"
-// # include "../iterators/reverse_iterator.hpp"
-//# include "../utils/BinaryTree.hpp"
+ # include "../iterators/reverse_iterator.hpp"
 # include "../utils/AVL.hpp"
 # include "../containers/vector.hpp"
 
-// for mli tester
-# include <map>
+// For mli tester
+//# include <map>
 
 namespace ft
 {
@@ -37,8 +36,8 @@ namespace ft
 		typedef typename	allocator_type::const_pointer					const_pointer;
 		typedef				map_iterator<value_type, node_type>				iterator;
 		typedef				map_iterator<const value_type, node_type>		const_iterator;
-		/*typedef typename	ft::reverse_iterator<iterator>					reverse_iterator;
-		typedef typename	ft::reverse_iterator<const_iterator>			const_reverse_iterator;*/
+		typedef typename	ft::reverse_iterator<iterator>					reverse_iterator;
+		typedef typename	ft::reverse_iterator<const_iterator>			const_reverse_iterator;
 		typedef typename	ft::iterator_traits<iterator>::difference_type	difference_type;
 		typedef				size_t											size_type;
 		
@@ -98,6 +97,21 @@ namespace ft
 			return ret;
 		}
 
+		reverse_iterator rbegin() {
+			return reverse_iterator(this->avl.end());
+		}
+		const_reverse_iterator rbegin() const {
+			const_reverse_iterator ret(this->avl.end());
+			return ret;
+		}
+		reverse_iterator rend() {
+			return reverse_iterator(this->avl.begin());
+		}
+		const_reverse_iterator rend() const {
+			const_reverse_iterator ret(this->avl.begin());
+			return ret;
+		}
+
 		// Capacity
 		bool empty() const {
 			return (this->avl.size() == 0);
@@ -106,9 +120,9 @@ namespace ft
 			return this->avl.size();
 		}
 		size_type max_size() const {
-			//return this->get_allocator().max_size();
-			std::map<key_type, mapped_type> m;	// for mli
-			return m.max_size();				// tester
+			return this->get_allocator().max_size();
+			//std::map<key_type, mapped_type> m;	// For mli
+			//return m.max_size();					// tester
 		}
 
 		// Element access
@@ -273,10 +287,60 @@ namespace ft
 		allocator_type get_allocator() const {
 			return this->avl.get_alloc();
 		}
+		
+		template <class Key2, class T2, class Compare2, class Alloc2>
+		friend bool operator==(const map<Key2, T2, Compare2, Alloc2>& lhs, const map<Key2, T2, Compare2, Alloc2>& rhs);
+		template <class Key2, class T2, class Compare2, class Alloc2>
+		friend bool operator!=(const map<Key2, T2, Compare2, Alloc2>& lhs, const map<Key2, T2, Compare2, Alloc2>& rhs);
+		template <class Key2, class T2, class Compare2, class Alloc2>
+		friend bool operator<(const map<Key2, T2, Compare2, Alloc2>& lhs, const map<Key2, T2, Compare2, Alloc2>& rhs);
+		template <class Key2, class T2, class Compare2, class Alloc2>
+		friend bool operator<=(const map<Key2, T2, Compare2, Alloc2>& lhs, const map<Key2, T2, Compare2, Alloc2>& rhs);
+		template <class Key2, class T2, class Compare2, class Alloc2>
+		friend bool operator>(const map<Key2, T2, Compare2, Alloc2>& lhs, const map<Key2, T2, Compare2, Alloc2>& rhs);
+		template <class Key2, class T2, class Compare2, class Alloc2>
+		friend bool operator>=(const map<Key2, T2, Compare2, Alloc2>& lhs, const map<Key2, T2, Compare2, Alloc2>& rhs);
 
 	private:
 		avl_type avl;
 	};
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator==(const map<Key,T,Compare,Alloc>& lhs,
+					const map<Key,T,Compare,Alloc>& rhs) {
+		return lhs.avl == rhs.avl;
+	}
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator!=(const map<Key,T,Compare,Alloc>& lhs,
+					const map<Key,T,Compare,Alloc>& rhs) {
+		return lhs.avl != rhs.avl;
+	}
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator<(const map<Key,T,Compare,Alloc>& lhs,
+					const map<Key,T,Compare,Alloc>& rhs) {
+		return lhs.avl < rhs.avl;
+	}
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator<=(const map<Key,T,Compare,Alloc>& lhs,
+					const map<Key,T,Compare,Alloc>& rhs) {
+		return lhs.avl <= rhs.avl;
+	}
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator>(const map<Key,T,Compare,Alloc>& lhs,
+					const map<Key,T,Compare,Alloc>& rhs) {
+		return lhs.avl > rhs.avl;
+	}
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator>=(const map<Key,T,Compare,Alloc>& lhs,
+					const map<Key,T,Compare,Alloc>& rhs) {
+		return lhs.avl >= rhs.avl;
+	}
+
+	template< class Key, class T, class Compare, class Alloc >
+	void swap( map<Key,T,Compare,Alloc>& lhs,
+	           map<Key,T,Compare,Alloc>& rhs ) {
+		lhs.swap(rhs);
+	}
 }
 
 #endif // MAP_HPP

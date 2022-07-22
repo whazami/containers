@@ -85,6 +85,11 @@ namespace ft
 				return 0;
 			return height(node->left) - height(node->right);
 		}
+
+		template <class T, class Compare>
+		bool operator<(const Node<T, Compare>& n1, const Node<T, Compare>& n2) {
+			return n1.pair.first < n2.pair.first;
+		}
 	}
 
 	template <class Key, class T, class Compare, class Alloc>
@@ -197,7 +202,6 @@ namespace ft
 
 		void swap(AVL& other) {
 			std::swap(this->root, other.root);
-			std::swap(this->endd, other.endd);
 			std::swap(this->end_ptr, other.end_ptr);
 			std::swap(this->sizee, other.sizee);
 			std::swap(this->comp, other.comp);
@@ -218,6 +222,19 @@ namespace ft
 		node_type *getRoot() {
 			return this->root;
 		}
+
+		template <class Key2, class T2, class Compare2, class Alloc2>
+		friend bool operator==(const AVL<Key2, T2, Compare2, Alloc2>& lhs, const AVL<Key2, T2, Compare2, Alloc2>& rhs);
+		template <class Key2, class T2, class Compare2, class Alloc2>
+		friend bool operator!=(const AVL<Key2, T2, Compare2, Alloc2>& lhs, const AVL<Key2, T2, Compare2, Alloc2>& rhs);
+		template <class Key2, class T2, class Compare2, class Alloc2>
+		friend bool operator<(const AVL<Key2, T2, Compare2, Alloc2>& lhs, const AVL<Key2, T2, Compare2, Alloc2>& rhs);
+		template <class Key2, class T2, class Compare2, class Alloc2>
+		friend bool operator<=(const AVL<Key2, T2, Compare2, Alloc2>& lhs, const AVL<Key2, T2, Compare2, Alloc2>& rhs);
+		template <class Key2, class T2, class Compare2, class Alloc2>
+		friend bool operator>(const AVL<Key2, T2, Compare2, Alloc2>& lhs, const AVL<Key2, T2, Compare2, Alloc2>& rhs);
+		template <class Key2, class T2, class Compare2, class Alloc2>
+		friend bool operator>=(const AVL<Key2, T2, Compare2, Alloc2>& lhs, const AVL<Key2, T2, Compare2, Alloc2>& rhs);
 
 	private:
 		node_type		*root;
@@ -293,6 +310,7 @@ namespace ft
 			}
 			return ret;
 		}
+
 		void print(const std::string& prefix, const node_type* node, bool isLeft) {
 			if (node) {
 				std::cout << prefix;
@@ -376,6 +394,7 @@ namespace ft
 			}
 			if (root == NULL)
 				return root;
+
 			// Update balance factors and balance the tree
 			root->height = 1 + std::max(height(root->left),
 										height(root->right));
@@ -398,6 +417,7 @@ namespace ft
 			}
 			return root;
 		}
+
 		// Rotations
 		node_type *rightRotate(node_type *y) {
 			node_type *x = y->left;
@@ -433,6 +453,56 @@ namespace ft
 		}
 		/// /////////////////// ///
 	};
+
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator==(const AVL<Key, T, Compare, Alloc>& lhs,
+					const AVL<Key, T, Compare, Alloc>& rhs) {
+		if (lhs.sizee != rhs.sizee)
+			return false;
+		for (typename AVL<Key, T, Compare, Alloc>::node_type *n1 = lhs.begin(), *n2 = rhs.begin()
+				; n1 != lhs.end(); n1 = n1->next(), n2 = n2->next())
+			if (n1->pair != n2->pair)
+				return false;
+		return true;
+	}
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator!=(const AVL<Key, T, Compare, Alloc>& lhs,
+					const AVL<Key, T, Compare, Alloc>& rhs) {
+		return !(lhs == rhs);
+	}
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator<(const AVL<Key, T, Compare, Alloc>& lhs,
+					const AVL<Key, T, Compare, Alloc>& rhs) {
+		typename AVL<Key, T, Compare, Alloc>::node_type *first1 = lhs.begin();
+		typename AVL<Key, T, Compare, Alloc>::node_type *last1 = lhs.end();
+		typename AVL<Key, T, Compare, Alloc>::node_type *first2 = rhs.begin();
+		typename AVL<Key, T, Compare, Alloc>::node_type *last2 = rhs.end();
+
+		while (first1 != last1) {
+			if (first2 == last2 || operator<(first2->pair, first1->pair))
+				return false;
+			else if (operator<(first1->pair, first2->pair))
+				return true;
+			first1 = first1->next();
+			first2 = first2->next();
+		}
+		return (first2 != last2);
+	}
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator<=(const AVL<Key, T, Compare, Alloc>& lhs,
+					const AVL<Key, T, Compare, Alloc>& rhs) {
+		return !(rhs < lhs);
+	}
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator>(const AVL<Key, T, Compare, Alloc>& lhs,
+					const AVL<Key, T, Compare, Alloc>& rhs) {
+		return rhs < lhs;
+	}
+	template <class Key, class T, class Compare, class Alloc>
+	bool operator>=(const AVL<Key, T, Compare, Alloc>& lhs,
+					const AVL<Key, T, Compare, Alloc>& rhs) {
+		return !(lhs < rhs);
+	}
 }
 
 #endif // AVL_HPP
