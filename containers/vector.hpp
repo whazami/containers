@@ -118,7 +118,7 @@ namespace ft
 				else {
 					if (n > this->capacityy) {
 						size_type new_capacity;
-						if (n > this->old_resize == 0 || n > this->old_resize * 2)
+						if (n <= this->old_resize || n > this->old_resize * 2)
 							new_capacity = n;
 						else
 							new_capacity = this->old_resize * 2;
